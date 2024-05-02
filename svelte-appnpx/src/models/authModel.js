@@ -1,4 +1,8 @@
 import { auth } from '../services/firebase.js';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+
+const googleProvider = new GoogleAuthProvider();
+
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -30,3 +34,12 @@ export const logoutUser = async () => {
     throw error;
   }
 };
+
+export const signInWithGoogle = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      return result.user;
+    } catch (error) {
+      throw error;
+    }
+  };

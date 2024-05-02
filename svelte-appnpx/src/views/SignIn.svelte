@@ -1,5 +1,6 @@
 <script>
-    import { loginUser } from '../models/authModel';
+    import { loginUser, signInWithGoogle } from '../models/authModel';
+    import { navigate } from 'svelte-routing'; 
   
     let email = '';
     let password = '';
@@ -9,15 +10,26 @@
       try {
         const user = await loginUser(email, password);
         console.log('Login successful', user);
-        // Redirect or perform some action upon successful login
+        navigate('/home');   
       } catch (e) {
         error = e.message;
         console.error('Login failed:', e);
       }
     }
-  </script>
   
-  <form on:submit|preventDefault={signIn}>
+    async function signInWithGoogleAction() {
+      try {
+        const user = await signInWithGoogle();
+        console.log('Google sign-in successful', user);
+        navigate('/home');  
+      } catch (e) {
+        error = e.message;
+        console.error('Google sign-in failed:', e);
+      }
+    }
+</script>
+
+<form on:submit|preventDefault={signIn}>
     <div>
       <label for="email">Email:</label>
       <input id="email" type="email" bind:value={email} placeholder="Enter your email" required>
@@ -27,12 +39,13 @@
       <input id="password" type="password" bind:value={password} placeholder="Enter your password" required>
     </div>
     <button type="submit">Sign In</button>
+    <button on:click|preventDefault={signInWithGoogleAction} type="button">Sign In with Google</button>
     {#if error}
       <p style="color: red;">{error}</p>
     {/if}
-  </form>
-  
-  <style>
+</form>
+
+<style>
     form > div {
       margin-bottom: 1em;
     }
@@ -40,23 +53,19 @@
       display: block;
       margin-bottom: 0.5em;
     }
-    input {
+    input, button {
       width: 100%;
       padding: 0.8em;
-      font-size: 1em;
       margin-top: 0.2em;
+      font-size: 1em;
     }
     button {
-      width: 100%;
-      padding: 1em;
       background-color: #007BFF;
       color: white;
       border: none;
       cursor: pointer;
-      font-size: 1em;
     }
     button:hover {
       background-color: #0056b3;
     }
-  </style>
-  
+</style>
