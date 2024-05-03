@@ -4,11 +4,14 @@
     function goToLandmarkForm() {
         navigate('/add-landmark'); // Navigate to the Add Landmark form
     }
+    function goToCategoryLandmark() {
+        navigate('/category-landmark');
+    }
 </script>
 
 <main>
     <h1>Welcome Home!</h1>
-    <button on:click={goToLandmarkForm}>Add Landmark</button> // Button to navigate to the form
+    <button on:click={goToCategoryLandmark}>Manage Categories</button>
 </main>
 
 <style>
