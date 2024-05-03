@@ -4,7 +4,7 @@
     import Signup from './views/Signup.svelte';
     import SignIn from './views/SignIn.svelte';
     import Main from './views/Main.svelte';
-    import AddLandmark from './views/AddLandmark.svelte';
+    import AddLandmark from './views/LandmarkCategory.svelte';
     import CategoryLandmark from './views/CategoryLandmark.svelte';  
     import { user } from './stores/authStore';
     import { onMount } from 'svelte';
