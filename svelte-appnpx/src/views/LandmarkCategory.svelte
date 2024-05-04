@@ -36,10 +36,7 @@
     });
 
     async function handleSubmit() {
-        if (!landmarkName || !description || !latitude || !longitude) {
-            error = 'All fields must be filled!';
-            return;
-        }
+      
 
         const landmark = { name: landmarkName, description, latitude, longitude };
         const result = await addLandmark(landmark, params.categoryId);
