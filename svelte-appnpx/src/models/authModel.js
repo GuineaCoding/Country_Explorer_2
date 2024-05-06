@@ -9,12 +9,17 @@ import {
   signOut
 } from 'firebase/auth';
 
-export const createUser = async (email, password) => {
+export async function createUser(email, password, firstName, lastName) {
   try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    return userCredential.user;
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      await updateProfile(user, {
+          displayName: `${firstName} ${lastName}`
+      });
+      return user;
   } catch (error) {
-    throw error;
+      console.error("Error creating user: ", error);
+      throw error;
   }
 };
 
