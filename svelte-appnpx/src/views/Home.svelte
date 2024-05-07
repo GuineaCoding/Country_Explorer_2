@@ -1,8 +1,8 @@
 <script>
-    import { navigate } from 'svelte-routing'; // Import navigate for programmatic navigation
+    import { navigate } from 'svelte-routing'; 
 
     function goToLandmarkForm() {
-        navigate('/add-landmark'); // Navigate to the Add Landmark form
+        navigate('/add-landmark');
     }
     function goToCategoryLandmark() {
         navigate('/category-landmark');

@@ -1,6 +1,6 @@
 <script>
     import { Router, Route, Link } from 'svelte-routing';
-    import Home from './views/Home.svelte';
+    import Home from '/views/Home.svelte';
     import Signup from './views/Signup.svelte';
     import SignIn from './views/SignIn.svelte';
     import Main from './views/Main.svelte';
