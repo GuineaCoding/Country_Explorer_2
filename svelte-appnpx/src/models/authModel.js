@@ -1,13 +1,6 @@
 import { auth } from '../services/firebase.js';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-
+import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword,signInWithEmailAndPassword, signOut} from 'firebase/auth';
 const googleProvider = new GoogleAuthProvider();
-
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut
-} from 'firebase/auth';
 
 export async function createUser(email, password, firstName, lastName) {
   try {
@@ -23,18 +16,19 @@ export async function createUser(email, password, firstName, lastName) {
   }
 };
 
+export const logoutUser = async () => {
+  try {
+      await signOut(auth);
+  } catch (error) {
+      console.error("Error logging out", error);
+      throw error;  
+  }
+};
+
 export const loginUser = async (email, password) => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     return userCredential.user;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const logoutUser = async () => {
-  try {
-    await signOut(auth);
   } catch (error) {
     throw error;
   }

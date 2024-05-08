@@ -1,8 +1,8 @@
 import { writable } from 'svelte/store';
-import { auth } from '../services/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 export const user = writable(null);
+const auth = getAuth();
 
 onAuthStateChanged(auth, (firebaseUser) => {
     if (firebaseUser) {
@@ -10,4 +10,9 @@ onAuthStateChanged(auth, (firebaseUser) => {
     } else {
         user.set(null);
     }
+});
+
+
+onAuthStateChanged(auth, (firebaseUser) => {
+    user.set(firebaseUser);
 });

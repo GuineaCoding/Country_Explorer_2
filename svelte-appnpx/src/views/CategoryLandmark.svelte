@@ -1,34 +1,33 @@
 <script>
     import { onMount } from 'svelte';
     import { navigate } from 'svelte-routing';
-    import { getAuth } from 'firebase/auth';
     import { db } from '../services/firebase';
     import { ref, set, push, onValue } from 'firebase/database';
+    import { user } from '../stores/authStore'; 
 
     let categories = [];
     let newCategoryName = '';
     let error = '';
 
-    const auth = getAuth();
-    const user = auth.currentUser;
+    $: $user, checkUser(); 
 
-    if (!user) {
-        navigate('/signin');
+    function checkUser() {
+        if (!$user) {
+            navigate('/signin');
+        } else {
+            const categoriesRef = ref(db, `users/${$user.uid}/categories`);
+            onValue(categoriesRef, (snapshot) => {
+                const data = snapshot.val();
+                categories = data ? Object.entries(data).map(([key, value]) => ({
+                    id: key,
+                    name: value.name
+                })) : [];
+            });
+        }
     }
-    function viewLandmarks(categoryId) {
-        navigate(`/landmark-category/${categoryId}`);
-    }
-
-    const categoriesRef = ref(db, `users/${user.uid}/categories`);
 
     onMount(() => {
-        onValue(categoriesRef, (snapshot) => {
-            const data = snapshot.val();
-            categories = data ? Object.entries(data).map(([key, value]) => ({
-                id: key,
-                name: value.name
-            })) : [];
-        });
+        // No need to return a function here as Svelte handles cleanup automatically now
     });
 
     async function addCategory() {
@@ -37,55 +36,39 @@
             return;
         }
 
+        if (!$user) return;
+
+        const categoriesRef = ref(db, `users/${$user.uid}/categories`);
         const newCategoryRef = push(categoriesRef);
         await set(newCategoryRef, { name: newCategoryName });
-        categories.push({ id: newCategoryRef.key, name: newCategoryName }); 
-        newCategoryName = '';  
+        categories.push({ id: newCategoryRef.key, name: newCategoryName });
+        newCategoryName = '';
+    }
+
+    function viewLandmarks(categoryId) {
+        navigate(`/landmark-category/${categoryId}`);
     }
 </script>
 
-<main>
-    <h1>Category Management</h1>
+<main class="section">
+    <h1 class="title">Category Management</h1>
     {#if error}
-        <p class="error">{error}</p>
+        <p class="notification is-danger">{error}</p>
     {/if}
     <ul>
         {#each categories as category}
-            <li>
-                {category.name}
-                <button on:click={() => viewLandmarks(category.id)}>View Landmarks</button>
+            <li class="mb-2">
+                <span>{category.name}</span>
+                <button class="button is-small is-info" on:click={() => viewLandmarks(category.id)}>View Landmarks</button>
             </li>
         {/each}
     </ul>
-    <div>
-        <input type="text" bind:value={newCategoryName} placeholder="Add new category" />
-        <button on:click={addCategory}>Add</button>
+    <div class="field has-addons">
+        <div class="control is-expanded">
+            <input class="input" type="text" bind:value={newCategoryName} placeholder="Add new category" />
+        </div>
+        <div class="control">
+            <button class="button is-primary" on:click={addCategory}>Add</button>
+        </div>
     </div>
 </main>
-
-<style>
-    .error {
-        color: red;
-        margin-bottom: 10px;
-    }
-    ul {
-        list-style-type: none;
-        padding: 0;
-    }
-    li {
-        padding: 5px 0;
-    }
-    input, button {
-        margin-top: 10px;
-    }
-    button {
-        padding: 5px 10px;
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        cursor: pointer;
-    }
-    button:hover {
-        background-color: #0056b3;
-    }
-</style>
