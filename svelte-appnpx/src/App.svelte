@@ -35,10 +35,10 @@
     }
 </script>
 
-<!-- Import Bulma in the <style> tag or via an external CSS file -->
+
 <style>
     .navbar-logo {
-        width: 150px; /* Adjust logo size as required */
+        width: 150px; 
     }
 </style>
 
