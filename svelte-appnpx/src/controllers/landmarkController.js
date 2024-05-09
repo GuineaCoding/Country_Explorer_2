@@ -1,25 +1,35 @@
-import * as landmarkModel from '../models/landmarkModel';
+// src/controllers/landmarkController.js
 
-export async function createLandmark(landmark, categoryId) {
-    if (!landmark.name || !landmark.description || !landmark.latitude || !landmark.longitude) {
-        console.error("Invalid landmark data.");
-        return false;
+import { db } from '../services/firebase';
+import { ref, get } from 'firebase/database';
+import { getAuth } from 'firebase/auth';
+
+export async function fetchLandmarkDetails(landmarkId, categoryId) {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+        console.error("User is not logged in.");
+        return null;
     }
-    return await landmarkModel.addLandmark(landmark, categoryId);
-}
 
-export async function fetchLandmarks(categoryId) {
-    return await landmarkModel.getLandmarks(categoryId);
-}
-
-export async function modifyLandmark(landmarkId, landmark, categoryId) {
-    if (!landmark.name || !landmark.description || !landmark.latitude || !landmark.longitude) {
-        console.error("Invalid landmark data.");
-        return false;
+    if (!landmarkId || !categoryId) {
+        console.error("Landmark ID or Category ID not provided.");
+        return null;
     }
-    return await landmarkModel.updateLandmark(landmarkId, landmark, categoryId);
-}
 
-export async function removeLandmark(landmarkId, categoryId) {
-    return await landmarkModel.deleteLandmark(landmarkId, categoryId);
+    const landmarkRef = ref(db, `users/${user.uid}/categories/${categoryId}/landmarks/${landmarkId}`);
+    try {
+        const snapshot = await get(landmarkRef);
+        if (snapshot.exists()) {
+            console.log("Landmark details fetched successfully!");
+            return snapshot.val();
+        } else {
+            console.log("No landmark found with the provided ID.");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error fetching landmark details:", error);
+        return null;
+    }
 }

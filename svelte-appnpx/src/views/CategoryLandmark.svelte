@@ -2,28 +2,48 @@
     import { onMount } from 'svelte';
     import { navigate } from 'svelte-routing';
     import { db } from '../services/firebase';
-    import { ref, set, push, onValue } from 'firebase/database';
-    import { user } from '../stores/authStore'; 
+    import { ref, set, push, remove, onValue } from 'firebase/database';
+    import { user } from '../stores/authStore';
 
     let categories = [];
     let newCategoryName = '';
     let error = '';
-    let loading = true; 
+    let loading = true;
 
-    $: if ($user === null && !loading) {
-        navigate('/signin'); 
-        loading = false; 
-        initializeCategories();
+    $: $user, checkAuthState(); 
+
+    function checkAuthState() {
+        if ($user === undefined) {
+            // Auth state still loading
+        } else if ($user) {
+            // User is logged in
+            initializeCategories();
+        } else {
+            // User is not logged in
+            loading = false;
+            navigate('/signin');
+        }
     }
 
     function initializeCategories() {
+        console.log('Initializing categories...');
         const categoriesRef = ref(db, `users/${$user.uid}/categories`);
         onValue(categoriesRef, (snapshot) => {
             const data = snapshot.val();
-            categories = data ? Object.entries(data).map(([key, value]) => ({
-                id: key,
-                name: value.name
-            })) : [];
+            if (data) {
+                categories = Object.entries(data).map(([key, value]) => ({
+                    id: key,
+                    name: value.name
+                }));
+            } else {
+                console.error('No categories found.');
+                error = 'No categories found.';
+            }
+            loading = false;
+        }, (error) => {
+            console.error('Firebase data fetch error:', error);
+            error = 'Failed to load data.';
+            loading = false;
         });
     }
 
@@ -33,13 +53,21 @@
             return;
         }
 
-        if (!$user) return; 
+        if (!$user) return;
 
         const categoriesRef = ref(db, `users/${$user.uid}/categories`);
         const newCategoryRef = push(categoriesRef);
         await set(newCategoryRef, { name: newCategoryName });
         categories.push({ id: newCategoryRef.key, name: newCategoryName });
         newCategoryName = '';
+    }
+
+    async function deleteCategory(categoryId) {
+        if (!$user) return;
+
+        const categoryRef = ref(db, `users/${$user.uid}/categories/${categoryId}`);
+        await remove(categoryRef);
+        categories = categories.filter(category => category.id !== categoryId);
     }
 
     function viewLandmarks(categoryId) {
@@ -50,7 +78,7 @@
 <main class="section">
     <h1 class="title">Category Management</h1>
     {#if loading}
-        <p>Loading...</p> <!-- Display loading message -->
+        <p>Loading...</p>
     {:else}
         {#if error}
             <p class="notification is-danger">{error}</p>
@@ -60,6 +88,7 @@
                 <li class="mb-2">
                     <span>{category.name}</span>
                     <button class="button is-small is-info" on:click={() => viewLandmarks(category.id)}>View Landmarks</button>
+                    <button class="button is-small is-danger ml-2" on:click={() => deleteCategory(category.id)}>Delete</button>
                 </li>
             {/each}
         </ul>

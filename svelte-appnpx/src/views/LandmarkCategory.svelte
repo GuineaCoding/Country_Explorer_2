@@ -1,12 +1,14 @@
 <script>
     import { onMount } from 'svelte';
     import { navigate } from 'svelte-routing';
-    import { fetchLandmarks, createLandmark, modifyLandmark } from '../controllers/landmarkController';
+    import { fetchLandmarks, createLandmark } from '../controllers/landmarkController';
     import { getAuth } from 'firebase/auth';
 
+    // Passed-in properties
     export let categoryId = '';
     export let categoryName = '';
 
+    // State variables
     let landmarks = [];
     let landmarkName = '';
     let description = '';
@@ -14,16 +16,11 @@
     let longitude = '';
     let error = '';
 
-    let editMode = false;
-    let editLandmarkId = null;
-    let editLandmarkName = '';
-    let editDescription = '';
-    let editLatitude = '';
-    let editLongitude = '';
-
+    // Get the current authenticated user
     const auth = getAuth();
     let user = auth.currentUser;
 
+    // Fetch landmarks on mount
     onMount(async () => {
         user = auth.currentUser;
         if (!user) {
@@ -32,9 +29,32 @@
             return;
         }
 
-        landmarks = await fetchLandmarks(categoryId);
+        if (!categoryId) {
+            console.error("Category ID is not specified");
+            return;
+        }
+
+        await fetchAndSetLandmarks();
     });
 
+    // Fetch landmarks and ensure unique entries
+    async function fetchAndSetLandmarks() {
+        try {
+            const fetchedLandmarks = await fetchLandmarks(categoryId);
+            const uniqueLandmarks = fetchedLandmarks.reduce((acc, current) => {
+                if (!acc.some(item => item.id === current.id)) {
+                    acc.push(current);
+                }
+                return acc;
+            }, []);
+            landmarks = uniqueLandmarks;
+        } catch (err) {
+            console.error('Failed to fetch landmarks:', err);
+            error = 'Failed to fetch landmarks. Please try again.';
+        }
+    }
+
+    // Handle new landmark submission
     async function handleSubmit() {
         if (!landmarkName || !description || !latitude || !longitude) {
             error = 'All fields must be filled!';
@@ -42,35 +62,22 @@
         }
 
         const landmark = { name: landmarkName, description, latitude, longitude };
-        const result = await createLandmark(landmark, categoryId);
-
-        if (result) {
-            alert('Landmark added successfully!');
-            landmarks = await fetchLandmarks(categoryId); // Refresh landmarks list
-            resetForm();
-        } else {
-            error = 'Failed to add landmark. Please try again.';
+        try {
+            const result = await createLandmark(landmark, categoryId);
+            if (result) {
+                alert('Landmark added successfully!');
+                await fetchAndSetLandmarks(); // Refresh landmarks list
+                resetForm();
+            } else {
+                error = 'Failed to add landmark. Please try again.';
+            }
+        } catch (err) {
+            console.error('Error adding landmark:', err);
+            error = 'Error occurred while adding landmark. Please try again.';
         }
     }
 
-    async function handleEditSubmit() {
-        if (!editLandmarkName || !editDescription || !editLatitude || !editLongitude) {
-            error = 'All fields must be filled!';
-            return;
-        }
-
-        const updatedLandmark = { name: editLandmarkName, description: editDescription, latitude: editLatitude, longitude: editLongitude };
-        const result = await modifyLandmark(editLandmarkId, updatedLandmark, categoryId);
-
-        if (result) {
-            alert('Landmark updated successfully!');
-            landmarks = await fetchLandmarks(categoryId); // Refresh landmarks list
-            resetEditForm();
-        } else {
-            error = 'Failed to update landmark. Please try again.';
-        }
-    }
-
+    // Reset form inputs
     function resetForm() {
         landmarkName = '';
         description = '';
@@ -78,102 +85,53 @@
         longitude = '';
         error = '';
     }
-
-    function resetEditForm() {
-        editMode = false;
-        editLandmarkId = null;
-        editLandmarkName = '';
-        editDescription = '';
-        editLatitude = '';
-        editLongitude = '';
-        error = '';
-    }
-
-    function startEditLandmark(landmark) {
-        editMode = true;
-        editLandmarkId = landmark.id;
-        editLandmarkName = landmark.name;
-        editDescription = landmark.description;
-        editLatitude = landmark.latitude;
-        editLongitude = landmark.longitude;
-    }
 </script>
 
-<main>
-    <h1>{categoryName}</h1>
+<main class="container">
+    <h1 class="title">{categoryName}</h1>
 
     <ul>
-        {#each landmarks as landmark}
+        {#each landmarks as landmark (landmark.id)}
             <li>
-                {#if editMode && editLandmarkId === landmark.id}
-                    <!-- Edit Landmark -->
-                    <form on:submit|preventDefault={handleEditSubmit}>
-                        <label for="editName">Landmark Name:</label>
-                        <input id="editName" type="text" bind:value={editLandmarkName} />
-
-                        <label for="editDescription">Description:</label>
-                        <textarea id="editDescription" bind:value={editDescription}></textarea>
-
-                        <label for="editLatitude">Latitude:</label>
-                        <input id="editLatitude" type="text" bind:value={editLatitude} />
-
-                        <label for="editLongitude">Longitude:</label>
-                        <input id="editLongitude" type="text" bind:value={editLongitude} />
-
-                        <button type="submit">Save</button>
-                        <button type="button" on:click={resetEditForm}>Cancel</button>
-                    </form>
-                {:else}
-                    <!-- Display Landmark -->
+                <!-- Display Landmark -->
+                <div class="content">
                     {landmark.name} - {landmark.description}
                     <br />
                     Latitude: {landmark.latitude}, Longitude: {landmark.longitude}
-                    <button on:click={() => startEditLandmark(landmark)}>Edit</button>
-                {/if}
+                    <button class="button is-small is-info" on:click={() => navigate(`/landmark-details/${landmark.id}`)}>Open Landmark</button>
+                </div>
             </li>
         {/each}
     </ul>
 
-    <h2>Add New Landmark</h2>
+    <h2 class="subtitle">Add New Landmark</h2>
     <form on:submit|preventDefault={handleSubmit}>
         {#if error}
-            <p class="error">{error}</p>
+            <p class="notification is-danger">{error}</p>
         {/if}
 
-        <label for="name">Landmark Name:</label>
-        <input id="name" type="text" bind:value={landmarkName} />
+        <div class="field">
+            <label class="label" for="name">Landmark Name:</label>
+            <input class="input" id="name" type="text" bind:value={landmarkName} />
+        </div>
 
-        <label for="description">Description:</label>
-        <textarea id="description" bind:value={description}></textarea>
+        <div class="field">
+            <label class="label" for="description">Description:</label>
+            <textarea class="textarea" id="description" bind:value={description}></textarea>
+        </div>
 
-        <label for="latitude">Latitude:</label>
-        <input id="latitude" type="text" bind:value={latitude} />
+        <div class="field">
+            <label class="label" for="latitude">Latitude:</label>
+            <input class="input" id="latitude" type="text" bind:value={latitude} />
+        </div>
 
-        <label for="longitude">Longitude:</label>
-        <input id="longitude" type="text" bind:value={longitude} />
+        <div class="field">
+            <label class="label" for="longitude">Longitude:</label>
+            <input class="input" id="longitude" type="text" bind:value={longitude} />
+        </div>
 
-        <button type="submit">Add Landmark</button>
+        <div class="buttons">
+            <button class="button is-link" type="submit">Add Landmark</button>
+        </div>
     </form>
 </main>
-
-<style>
-    .error {
-        color: red;
-        margin-bottom: 10px;
-    }
-    label, input, textarea, button {
-        display: block;
-        width: 100%;
-        margin-top: 10px;
-    }
-    button {
-        padding: 10px 15px;
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        cursor: pointer;
-    }
-    button:hover {
-        background-color: #0056b3;
-    }
-</style>
