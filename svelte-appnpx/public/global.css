@@ -64,3 +64,35 @@ button:focus {
 .navbar-logo {
 	width: 150px; 
 }
+
+main.container {
+	margin-top: 2rem;
+}
+
+.landmark-list {
+	list-style: none;
+	padding-left: 0;
+}
+
+.landmark-item {
+	padding: 1rem;
+	border-bottom: 1px solid #dbdbdb;
+	transition: background-color 0.2s ease;
+}
+
+.landmark-item:last-child {
+	border-bottom: none;
+}
+
+.landmark-item:hover {
+	background-color: #f5f5f5;
+}
+
+.title.is-5 {
+	margin-bottom: 0.25rem;
+}
+
+.subtitle.is-6 {
+	margin-bottom: 0.5rem;
+	color: #777;
+}

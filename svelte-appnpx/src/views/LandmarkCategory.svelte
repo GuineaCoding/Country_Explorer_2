@@ -1,137 +1,105 @@
 <script>
     import { onMount } from 'svelte';
     import { navigate } from 'svelte-routing';
-    import { fetchLandmarks, createLandmark } from '../controllers/landmarkController';
-    import { getAuth } from 'firebase/auth';
+    import { getAuth, onAuthStateChanged } from 'firebase/auth';
+    import { fetchLandmarks, removeLandmark } from '../controllers/landmarkController';
+    import { user } from '../stores/authStore';
 
-    // Passed-in properties
     export let categoryId = '';
     export let categoryName = '';
 
-    // State variables
     let landmarks = [];
-    let landmarkName = '';
-    let description = '';
-    let latitude = '';
-    let longitude = '';
     let error = '';
+    let loading = true;
 
-    // Get the current authenticated user
-    const auth = getAuth();
-    let user = auth.currentUser;
+    $: $user, checkAuthState();
 
-    // Fetch landmarks on mount
-    onMount(async () => {
-        user = auth.currentUser;
-        if (!user) {
-            console.error("User not logged in");
+    function checkAuthState() {
+        if ($user === undefined) {
+            loading = true;
+            error = '';
+        } else if ($user) {
+            console.log("User is logged in, initializing landmarks...");
+            initializeLandmarks();
+        } else {
+            console.log("No user logged in, redirecting...");
+            error = "User not logged in. Please sign in.";
+            loading = false;
             navigate('/signin');
-            return;
         }
+    }
 
-        if (!categoryId) {
-            console.error("Category ID is not specified");
-            return;
-        }
-
-        await fetchAndSetLandmarks();
-    });
-
-    // Fetch landmarks and ensure unique entries
-    async function fetchAndSetLandmarks() {
-        try {
-            const fetchedLandmarks = await fetchLandmarks(categoryId);
-            const uniqueLandmarks = fetchedLandmarks.reduce((acc, current) => {
-                if (!acc.some(item => item.id === current.id)) {
-                    acc.push(current);
+    function initializeLandmarks() {
+        console.log("Fetching landmarks for categoryId:", categoryId);
+        loading = true;
+        fetchLandmarks(categoryId).then(fetchedLandmarks => {
+            console.log("Fetched landmarks:", fetchedLandmarks);
+            landmarks = fetchedLandmarks.map((landmark, index) => {
+                if (!landmark.id) {
+                    console.error('No ID found for landmark:', landmark);
+                    landmark.id = `fallback-${index}`;
                 }
-                return acc;
-            }, []);
-            landmarks = uniqueLandmarks;
-        } catch (err) {
+                return {
+                    ...landmark,
+                    uniqueKey: landmark.id
+                };
+            });
+            console.log("Processed landmarks:", landmarks);
+            loading = false;
+        }).catch(err => {
             console.error('Failed to fetch landmarks:', err);
             error = 'Failed to fetch landmarks. Please try again.';
-        }
+            loading = false;
+        });
     }
 
-    // Handle new landmark submission
-    async function handleSubmit() {
-        if (!landmarkName || !description || !latitude || !longitude) {
-            error = 'All fields must be filled!';
+    async function deleteLandmark(landmarkId) {
+        console.log("Attempting to delete landmark with ID:", landmarkId);
+        if (!landmarkId) {
+            console.error("Invalid or missing landmark ID.");
             return;
         }
-
-        const landmark = { name: landmarkName, description, latitude, longitude };
         try {
-            const result = await createLandmark(landmark, categoryId);
-            if (result) {
-                alert('Landmark added successfully!');
-                await fetchAndSetLandmarks(); // Refresh landmarks list
-                resetForm();
+            const success = await removeLandmark(landmarkId, categoryId);
+            if (success) {
+                console.log("Landmark deleted successfully");
+                landmarks = landmarks.filter(landmark => landmark.id !== landmarkId);
             } else {
-                error = 'Failed to add landmark. Please try again.';
+                error = 'Failed to delete the landmark. Please try again.';
             }
         } catch (err) {
-            console.error('Error adding landmark:', err);
-            error = 'Error occurred while adding landmark. Please try again.';
+            console.error('Error during deletion:', err);
+            error = 'Failed to delete the landmark. Please try again.';
         }
-    }
-
-    // Reset form inputs
-    function resetForm() {
-        landmarkName = '';
-        description = '';
-        latitude = '';
-        longitude = '';
-        error = '';
     }
 </script>
 
+
 <main class="container">
-    <h1 class="title">{categoryName}</h1>
+    <h1 class="title has-text-centered">{categoryName}</h1>
 
-    <ul>
-        {#each landmarks as landmark (landmark.id)}
-            <li>
-                <!-- Display Landmark -->
-                <div class="content">
-                    {landmark.name} - {landmark.description}
-                    <br />
-                    Latitude: {landmark.latitude}, Longitude: {landmark.longitude}
-                    <button class="button is-small is-info" on:click={() => navigate(`/landmark-details/${landmark.id}`)}>Open Landmark</button>
-                </div>
-            </li>
-        {/each}
-    </ul>
-
-    <h2 class="subtitle">Add New Landmark</h2>
-    <form on:submit|preventDefault={handleSubmit}>
-        {#if error}
-            <p class="notification is-danger">{error}</p>
-        {/if}
-
-        <div class="field">
-            <label class="label" for="name">Landmark Name:</label>
-            <input class="input" id="name" type="text" bind:value={landmarkName} />
+    {#if loading}
+        <p class="notification is-info has-text-centered">Loading landmarks...</p>
+    {:else if error}
+        <p class="notification is-danger has-text-centered">{error}</p>
+    {:else}
+        <div class="box">
+            <ul class="landmark-list">
+                {#each landmarks as landmark (landmark.uniqueKey)}
+                    <li class="landmark-item">
+                        <div class="content">
+                            <p class="title is-5">{landmark.name}</p>
+                            <p class="subtitle is-6">{landmark.description}</p>
+                            <p>Latitude: {landmark.latitude}, Longitude: {landmark.longitude}</p>
+                            <div class="buttons">
+                                <button class="button is-small is-danger" on:click={() => deleteLandmark(landmark.id)}>
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </li>
+                {/each}
+            </ul>
         </div>
-
-        <div class="field">
-            <label class="label" for="description">Description:</label>
-            <textarea class="textarea" id="description" bind:value={description}></textarea>
-        </div>
-
-        <div class="field">
-            <label class="label" for="latitude">Latitude:</label>
-            <input class="input" id="latitude" type="text" bind:value={latitude} />
-        </div>
-
-        <div class="field">
-            <label class="label" for="longitude">Longitude:</label>
-            <input class="input" id="longitude" type="text" bind:value={longitude} />
-        </div>
-
-        <div class="buttons">
-            <button class="button is-link" type="submit">Add Landmark</button>
-        </div>
-    </form>
+    {/if}
 </main>

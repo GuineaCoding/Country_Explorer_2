@@ -5,8 +5,8 @@
     import SignIn from './views/SignIn.svelte';
     import Main from './views/Main.svelte';
     import LandmarkCategory from './views/LandmarkCategory.svelte';
-    import CategoryLandmark from './views/CategoryLandmark.svelte';
-    import LandmarkDetails from './views/LandmarkDetails.svelte';
+    import Category from './views/Category.svelte';
+    // import LandmarkDetails from './views/LandmarkDetails.svelte';
     import { user } from './stores/authStore';
     import { logoutUser } from './models/authModel.js';
     import { navigate } from 'svelte-routing';
@@ -44,7 +44,7 @@
         <div class="navbar-menu">
             <div class="navbar-end">
                 {#if $user}
-                    <Link to="/category-landmark" class="navbar-item">Manage Categories</Link>
+                    <Link to="/category" class="navbar-item">Manage Categories</Link>
                     <button class="button is-light" on:click={handleLogout}>Logout</button>
                 {:else}
                     <Link to="/signup" class="navbar-item">Sign Up</Link>
@@ -59,8 +59,8 @@
     <Route path="/home" component={Home} />
     <Route path="/signup" component={Signup} />
     <Route path="/signin" component={SignIn} />
-    <Route path="/category-landmark" component={CategoryLandmark} />
+    <Route path="/category" component={Category} />
     <Route path="/landmark-category/:categoryId" component={LandmarkCategory} />
-    <Route path="/landmark-details/:landmarkId" component={LandmarkDetails} />
+    <!-- <Route path="/landmark-details/:landmarkId" component={LandmarkDetails} /> -->
 
 </Router>

@@ -5,7 +5,7 @@
         navigate('/add-landmark');
     }
     function goToCategoryLandmark() {
-        navigate('/category-landmark');
+        navigate('/category');
     }
 </script>
 

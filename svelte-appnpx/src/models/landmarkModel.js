@@ -1,3 +1,5 @@
+// models/landmarkModel.js
+
 import { db } from '../services/firebase';
 import { ref, set, push, get, remove, update } from 'firebase/database';
 import { getAuth } from 'firebase/auth';
@@ -40,7 +42,17 @@ export async function getLandmarks(categoryId) {
     const landmarksRef = ref(db, `users/${user.uid}/categories/${categoryId}/landmarks`);
     try {
         const snapshot = await get(landmarksRef);
-        return snapshot.val() ? Object.values(snapshot.val()) : [];
+        const data = snapshot.val();
+
+        if (!data) {
+            return [];
+        }
+
+        // Convert data object to an array and include the Firebase keys as `id` properties
+        return Object.entries(data).map(([key, value]) => ({
+            id: key,
+            ...value
+        }));
     } catch (e) {
         console.error("Error fetching landmarks: ", e);
         return [];
