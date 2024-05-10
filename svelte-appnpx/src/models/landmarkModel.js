@@ -98,3 +98,12 @@ export async function deleteLandmark(landmarkId, categoryId) {
         return false;
     }
 }
+export async function fetchLandmark(userId, categoryId, landmarkId) {
+    const landmarkRef = ref(db, `users/${userId}/categories/${categoryId}/landmarks/${landmarkId}`);
+    const snapshot = await get(landmarkRef);
+    if (snapshot.exists()) {
+        return { id: snapshot.key, ...snapshot.val() };
+    } else {
+        throw new Error("Landmark not found");
+    }
+}

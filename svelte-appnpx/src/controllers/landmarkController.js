@@ -1,5 +1,5 @@
 // controller/landmarkController.js
-
+import { getAuth } from 'firebase/auth';
 import * as landmarkModel from '../models/landmarkModel';
 
 export async function createLandmark(landmark, categoryId) {
@@ -13,7 +13,6 @@ export async function createLandmark(landmark, categoryId) {
 export async function fetchLandmarks(categoryId) {
     const landmarks = await landmarkModel.getLandmarks(categoryId);
 
-    // Map to ensure each landmark object has an 'id' property
     return Object.entries(landmarks).map(([key, value]) => ({
         id: key,
         ...value
@@ -31,3 +30,21 @@ export async function modifyLandmark(landmarkId, landmark, categoryId) {
 export async function removeLandmark(landmarkId, categoryId) {
     return await landmarkModel.deleteLandmark(landmarkId, categoryId);
 }
+
+export async function getLandmarkDetails(categoryId, landmarkId) {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+        throw new Error("User is not logged in.");
+    }
+
+    try {
+        return await landmarkModel.fetchLandmark(user.uid, categoryId, landmarkId);
+    } catch (error) {
+        console.error("Error retrieving landmark details:", error);
+        throw error; 
+    }
+}
+
+

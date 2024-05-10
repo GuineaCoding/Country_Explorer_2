@@ -1,7 +1,5 @@
 <script>
-    import { onMount } from 'svelte';
     import { navigate } from 'svelte-routing';
-    import { getAuth, onAuthStateChanged } from 'firebase/auth';
     import { fetchLandmarks, removeLandmark } from '../controllers/landmarkController';
     import { user } from '../stores/authStore';
 
@@ -12,6 +10,7 @@
     let error = '';
     let loading = true;
 
+    // Check authentication state
     $: $user, checkAuthState();
 
     function checkAuthState() {
@@ -19,10 +18,8 @@
             loading = true;
             error = '';
         } else if ($user) {
-            console.log("User is logged in, initializing landmarks...");
             initializeLandmarks();
         } else {
-            console.log("No user logged in, redirecting...");
             error = "User not logged in. Please sign in.";
             loading = false;
             navigate('/signin');
@@ -30,13 +27,10 @@
     }
 
     function initializeLandmarks() {
-        console.log("Fetching landmarks for categoryId:", categoryId);
         loading = true;
         fetchLandmarks(categoryId).then(fetchedLandmarks => {
-            console.log("Fetched landmarks:", fetchedLandmarks);
             landmarks = fetchedLandmarks.map((landmark, index) => {
                 if (!landmark.id) {
-                    console.error('No ID found for landmark:', landmark);
                     landmark.id = `fallback-${index}`;
                 }
                 return {
@@ -44,36 +38,37 @@
                     uniqueKey: landmark.id
                 };
             });
-            console.log("Processed landmarks:", landmarks);
             loading = false;
         }).catch(err => {
-            console.error('Failed to fetch landmarks:', err);
             error = 'Failed to fetch landmarks. Please try again.';
             loading = false;
         });
     }
 
+    // Delete a landmark
     async function deleteLandmark(landmarkId) {
-        console.log("Attempting to delete landmark with ID:", landmarkId);
         if (!landmarkId) {
-            console.error("Invalid or missing landmark ID.");
             return;
         }
         try {
             const success = await removeLandmark(landmarkId, categoryId);
             if (success) {
-                console.log("Landmark deleted successfully");
                 landmarks = landmarks.filter(landmark => landmark.id !== landmarkId);
             } else {
                 error = 'Failed to delete the landmark. Please try again.';
             }
         } catch (err) {
-            console.error('Error during deletion:', err);
             error = 'Failed to delete the landmark. Please try again.';
         }
     }
-</script>
 
+    // View a landmark detail
+    function viewLandmark(landmarkId) {
+        if (landmarkId) {
+            navigate(`/landmark/${landmarkId}`);
+        }
+    }
+</script>
 
 <main class="container">
     <h1 class="title has-text-centered">{categoryName}</h1>
@@ -92,6 +87,9 @@
                             <p class="subtitle is-6">{landmark.description}</p>
                             <p>Latitude: {landmark.latitude}, Longitude: {landmark.longitude}</p>
                             <div class="buttons">
+                                <button on:click={() => navigate(`/landmark/${categoryId}/${landmark.id}`)}>
+                                    View {landmark.name}
+                                </button>
                                 <button class="button is-small is-danger" on:click={() => deleteLandmark(landmark.id)}>
                                     Delete
                                 </button>

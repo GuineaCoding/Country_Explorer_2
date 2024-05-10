@@ -6,7 +6,7 @@
     import Main from './views/Main.svelte';
     import LandmarkCategory from './views/LandmarkCategory.svelte';
     import Category from './views/Category.svelte';
-    // import LandmarkDetails from './views/LandmarkDetails.svelte';
+    import LandmarkDetail from './views/LandmarkDetail.svelte'; 
     import { user } from './stores/authStore';
     import { logoutUser } from './models/authModel.js';
     import { navigate } from 'svelte-routing';
@@ -55,12 +55,16 @@
     </nav>
 
     <!-- Define routes here -->
-    <Route path="/" component={Main} />
-    <Route path="/home" component={Home} />
-    <Route path="/signup" component={Signup} />
-    <Route path="/signin" component={SignIn} />
-    <Route path="/category" component={Category} />
-    <Route path="/landmark-category/:categoryId" component={LandmarkCategory} />
-    <!-- <Route path="/landmark-details/:landmarkId" component={LandmarkDetails} /> -->
+
+        <!-- Define routes here -->
+        <Route path="/" component={Main} />
+        <Route path="/home" component={Home} />
+        <Route path="/signup" component={Signup} />
+        <Route path="/signin" component={SignIn} />
+        <Route path="/category" component={Category} />
+        <Route path="/landmark-category/:categoryId" component={LandmarkCategory} />
+        <Route path="/landmark/:categoryId/:landmarkId" component={LandmarkDetail} />
+
+    
 
 </Router>
