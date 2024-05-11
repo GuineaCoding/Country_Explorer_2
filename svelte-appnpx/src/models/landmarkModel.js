@@ -1,5 +1,3 @@
-// models/landmarkModel.js
-
 import { db } from '../services/firebase';
 import { ref, set, push, get, remove, update } from 'firebase/database';
 import { getAuth } from 'firebase/auth';
@@ -48,7 +46,6 @@ export async function getLandmarks(categoryId) {
             return [];
         }
 
-        // Convert data object to an array and include the Firebase keys as `id` properties
         return Object.entries(data).map(([key, value]) => ({
             id: key,
             ...value
@@ -59,27 +56,20 @@ export async function getLandmarks(categoryId) {
     }
 }
 
-export async function updateLandmark(landmarkId, landmark, categoryId) {
-    const auth = getAuth();
-    const user = auth.currentUser;
-
-    if (!user) {
-        console.error("User is not logged in.");
-        return false;
-    }
-
-    const landmarkRef = ref(db, `users/${user.uid}/categories/${categoryId}/landmarks/${landmarkId}`);
+export async function updateLandmark(userId, categoryId, landmarkId, details) {
+    console.log("Updating with details:", details);
+    const landmarkRef = ref(db, `users/${userId}/categories/${categoryId}/landmarks/${landmarkId}`);
     try {
-        await update(landmarkRef, landmark);
+        await update(landmarkRef, details);
         console.log("Landmark updated successfully!");
         return true;
-    } catch (e) {
-        console.error("Error updating landmark: ", e);
+    } catch (error) {
+        console.error("Error updating landmark:", error);
         return false;
     }
 }
 
-export async function deleteLandmark(landmarkId, categoryId) {
+export async function deleteLandmark(userId, categoryId, landmarkId) {
     const auth = getAuth();
     const user = auth.currentUser;
 
@@ -94,10 +84,11 @@ export async function deleteLandmark(landmarkId, categoryId) {
         console.log("Landmark deleted successfully!");
         return true;
     } catch (e) {
-        console.error("Error deleting landmark: ", e);
+        console.error("Error deleting landmark:", e);
         return false;
     }
 }
+
 export async function fetchLandmark(userId, categoryId, landmarkId) {
     const landmarkRef = ref(db, `users/${userId}/categories/${categoryId}/landmarks/${landmarkId}`);
     const snapshot = await get(landmarkRef);
