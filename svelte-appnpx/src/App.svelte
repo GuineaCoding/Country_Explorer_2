@@ -64,7 +64,4 @@
         <Route path="/category" component={Category} />
         <Route path="/landmark-category/:categoryId" component={LandmarkCategory} />
         <Route path="/landmark/:categoryId/:landmarkId" component={LandmarkDetail} />
-
-    
-
 </Router>
