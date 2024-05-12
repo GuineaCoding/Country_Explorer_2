@@ -29,6 +29,10 @@
         }
     }
 
+    function goToPasswordReset() {
+        navigate('/password-reset');  // This route should match the one set up in your main router
+    }
+
     async function signInWithGoogleAction() {
         try {
             const user = await signInWithGoogle();
@@ -91,6 +95,9 @@
     .google-button {
         background-color: #4eb99f;
     }
+    .password-reset-button {
+        background-color: #ed563b;
+    }
 </style>
 
 <main>
@@ -118,6 +125,12 @@
         <div class="field">
             <div class="control">
                 <button class="button google-button" on:click|preventDefault={signInWithGoogleAction} type="button">Sign In with Google</button>
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="control">
+                <button class="button password-reset-button" on:click|preventDefault={goToPasswordReset} type="button">Reset Password</button>
             </div>
         </div>
 

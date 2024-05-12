@@ -39,6 +39,10 @@
         }
     }
 
+    function goToPasswordReset() {
+        navigate('/password-reset');  
+    }
+
     // Function to sign up using Google authentication
     async function signUpWithGoogle() {
         try {
@@ -48,7 +52,7 @@
             // Redirect after a brief delay to allow user to read the message
             setTimeout(() => {
                 navigate('/home');
-            }, 3000);
+            }, 1500);
         } catch (e) {
             // Display a general error message for Google sign-up errors
             error = "An error occurred during Google signup. Please try again.";
@@ -108,6 +112,10 @@
     .google-button {
         background-color: #4eb99f;
     }
+
+    .password-reset-button {
+        background-color: #ed563b;
+    }
 </style>
 
 <main>
@@ -151,6 +159,11 @@
                 <button class="button google-button" type="button" on:click={signUpWithGoogle}>Sign Up with Google</button>
             </div>
         </div>
+
+        <div class="field">
+            <div class="control">
+                <button class="button password-reset-button" on:click|preventDefault={goToPasswordReset} type="button">Reset Password</button>
+            </div>
 
         {#if error}
             <div class="notification is-danger">

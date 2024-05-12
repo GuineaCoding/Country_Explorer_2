@@ -10,8 +10,11 @@
     import { user } from './stores/authStore';
     import { logoutUser } from './models/authModel.js';
     import { navigate } from 'svelte-routing';
+    import UserProfile from './views/UserProfile.svelte';
+    import PasswordReset from './views/PasswordReset.svelte';
+    
 
-    const logoUrl = '/assets/logo.png'; 
+    const logoUrl = './logo.svg'; 
 
     let isAuthenticated = false;
     $: user.subscribe(value => {
@@ -25,55 +28,48 @@
     }
 
     async function handleLogout(event) {
-        event.preventDefault(); // Prevent default navigation
+        event.preventDefault(); 
         await logoutUser();
         user.set(null);
         navigate('/signin'); 
     }
+    
 </script>
 
 <style>
-    .navbar {
-        background-color: #122f41; /* Dark blue background */
-        padding: 1rem;
-    }
+.navbar {
+    background-color: #122f41; 
+    padding: 1rem;
+}
 
-    .navbar-logo {
-        height: 50px;
-        margin-right: 1rem;
-    }
+.navbar-logo {
+    height: 50px;
+    margin-right: 1rem;
+}
 
-    .navbar-menu {
-        display: flex;
-        align-items: center;
-    }
+.navbar-menu {
+    display: flex;
+    align-items: center;
+}
 
-    .navbar-item,
-    .navbar-link {
-        color: white;
-        text-decoration: none;
-        padding: 0.5rem 1rem;
-        border-radius: 4px;
-        transition: background-color 0.2s;
-    }
+.navbar-link, .logout-link {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
 
-    .navbar-item:hover,
-    .navbar-link:hover {
-        background-color: #f2b035; 
-    }
+.navbar-link:hover, .logout-link:hover {
+    background-color: #f2b035;
+}
 
-    .logout-link {
-        cursor: pointer;
-        color: white;
-        text-decoration: none;
-        padding: 0.5rem 1rem;
-        border-radius: 4px;
-        transition: background-color 0.2s;
-    }
-
-    .logout-link:hover {
-        background-color: #f2b035; 
-    }
+.navbar-burger {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
 </style>
 
 <Router>
@@ -81,17 +77,18 @@
     <nav class="navbar">
         <div class="navbar-brand">
             <img class="navbar-logo" src={logoUrl} alt="Logo">
-            <a role="button" class="navbar-burger">
+            <button class="navbar-burger" aria-label="menu">
                 <span style="background-color: white;"></span>
                 <span style="background-color: white;"></span>
                 <span style="background-color: white;"></span>
-            </a>
+            </button>
         </div>
         <div class="navbar-menu">
             <div class="navbar-end">
                 {#if $user}
                     <Link to="/category" class="navbar-link">Manage Categories</Link>
-                    <a href="#" class="logout-link" on:click={handleLogout}>Logout</a>
+                    <Link to="/profile" class="navbar-link">Profile</Link>
+                    <a href="javascript:void(0);" class="logout-link" on:click={handleLogout}>Logout</a>
                 {:else}
                     <Link to="/signup" class="navbar-link">Sign Up</Link>
                     <Link to="/signin" class="navbar-link">Sign In</Link>
@@ -108,4 +105,7 @@
     <Route path="/category" component={Category} />
     <Route path="/landmark-category/:categoryId" component={LandmarkCategory} />
     <Route path="/landmark/:categoryId/:landmarkId" component={LandmarkDetail} />
+    <Route path="/profile" component={UserProfile} onEnter={requireAuth} />
+    <Route path="/password-reset" component={PasswordReset} /> 
 </Router>
+
