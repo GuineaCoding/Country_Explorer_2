@@ -24,44 +24,88 @@
         }
     }
 
-    async function handleLogout() {
-        try {
-            await logoutUser();
-            user.set(null);
-            navigate('/signin'); 
-        } catch (error) {
-            console.error("Failed to logout", error);
-        }
+    async function handleLogout(event) {
+        event.preventDefault(); // Prevent default navigation
+        await logoutUser();
+        user.set(null);
+        navigate('/signin'); 
     }
 </script>
 
+<style>
+    .navbar {
+        background-color: #122f41; /* Dark blue background */
+        padding: 1rem;
+    }
+
+    .navbar-logo {
+        height: 50px;
+        margin-right: 1rem;
+    }
+
+    .navbar-menu {
+        display: flex;
+        align-items: center;
+    }
+
+    .navbar-item,
+    .navbar-link {
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+
+    .navbar-item:hover,
+    .navbar-link:hover {
+        background-color: #f2b035; 
+    }
+
+    .logout-link {
+        cursor: pointer;
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+
+    .logout-link:hover {
+        background-color: #f2b035; 
+    }
+</style>
+
 <Router>
     <!-- Navigation bar -->
-    <nav class="navbar is-light">
+    <nav class="navbar">
         <div class="navbar-brand">
-            <img class="navbar-logo" src="/path/to/logo.png" alt="Logo">
+            <img class="navbar-logo" src={logoUrl} alt="Logo">
+            <a role="button" class="navbar-burger">
+                <span style="background-color: white;"></span>
+                <span style="background-color: white;"></span>
+                <span style="background-color: white;"></span>
+            </a>
         </div>
         <div class="navbar-menu">
             <div class="navbar-end">
                 {#if $user}
-                    <Link to="/category" class="navbar-item">Manage Categories</Link>
-                    <button class="button is-light" on:click={handleLogout}>Logout</button>
+                    <Link to="/category" class="navbar-link">Manage Categories</Link>
+                    <a href="#" class="logout-link" on:click={handleLogout}>Logout</a>
                 {:else}
-                    <Link to="/signup" class="navbar-item">Sign Up</Link>
-                    <Link to="/signin" class="navbar-item">Sign In</Link>
+                    <Link to="/signup" class="navbar-link">Sign Up</Link>
+                    <Link to="/signin" class="navbar-link">Sign In</Link>
                 {/if}
             </div>
         </div>
     </nav>
 
-    <!-- Define routes here -->
-
-        <!-- Define routes here -->
-        <Route path="/" component={Main} />
-        <Route path="/home" component={Home} />
-        <Route path="/signup" component={Signup} />
-        <Route path="/signin" component={SignIn} />
-        <Route path="/category" component={Category} />
-        <Route path="/landmark-category/:categoryId" component={LandmarkCategory} />
-        <Route path="/landmark/:categoryId/:landmarkId" component={LandmarkDetail} />
+    <!-- Routes -->
+    <Route path="/" component={Main} />
+    <Route path="/home" component={Home} />
+    <Route path="/signup" component={Signup} />
+    <Route path="/signin" component={SignIn} />
+    <Route path="/category" component={Category} />
+    <Route path="/landmark-category/:categoryId" component={LandmarkCategory} />
+    <Route path="/landmark/:categoryId/:landmarkId" component={LandmarkDetail} />
 </Router>
