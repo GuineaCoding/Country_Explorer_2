@@ -123,7 +123,7 @@
       </div>
   
       <form class="edit-form" on:submit={updateUserProfile}>
-        <h2>Edit Profile</h2>
+        <h2>Edit Profile (Only alphabetic letters)</h2>
         <label>
           First Name:
           <input type="text" bind:value={firstName} required pattern="[A-Za-z]+">

@@ -37,7 +37,7 @@
         if (categoryId && landmarkId) {
             try {
                 const fetchedLandmark = await getLandmarkDetails(categoryId, landmarkId);
-                landmark = { ...fetchedLandmark }; // Spread properties into our editable object
+                landmark = { ...fetchedLandmark }; 
                 console.log("Landmark details fetched:", landmark);
             } catch (err) {
                 console.error("Failed to load landmark details:", err);

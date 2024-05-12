@@ -4,11 +4,23 @@
     import { db } from '../services/firebase';
     import { ref, set, push, remove, onValue } from 'firebase/database';
     import { user } from '../stores/authStore';
+    import Footer from './assets/Footer.svelte';
 
     let categories = [];
-    let newCategoryName = '';
+    let newCategoryType = '';
     let error = '';
     let loading = true;
+
+    const categoryTypes = [
+        "Mountain",
+        "Museum",
+        "Beach",
+        "Park",
+        "Historical Site",
+        "Restaurant",
+        "Shopping Mall",
+        "Art Gallery"
+    ];
 
     $: $user, checkAuthState(); 
 
@@ -26,7 +38,6 @@
     }
 
     function initializeCategories() {
-        console.log('Initializing categories...');
         const categoriesRef = ref(db, `users/${$user.uid}/categories`);
         onValue(categoriesRef, (snapshot) => {
             const data = snapshot.val();
@@ -36,20 +47,19 @@
                     name: value.name
                 }));
             } else {
-                console.error('No categories found.');
+                categories = [];
                 error = 'No categories found.';
             }
             loading = false;
         }, (error) => {
-            console.error('Firebase data fetch error:', error);
             error = 'Failed to load data.';
             loading = false;
         });
     }
 
     async function addCategory() {
-        if (newCategoryName.trim() === '') {
-            error = 'Please enter a category name.';
+        if (newCategoryType.trim() === '') {
+            error = 'Please select a category type.';
             return;
         }
 
@@ -57,9 +67,12 @@
 
         const categoriesRef = ref(db, `users/${$user.uid}/categories`);
         const newCategoryRef = push(categoriesRef);
-        await set(newCategoryRef, { name: newCategoryName });
-        categories.push({ id: newCategoryRef.key, name: newCategoryName });
-        newCategoryName = '';
+        await set(newCategoryRef, { name: newCategoryType });
+        categories.push({ id: newCategoryRef.key, name: newCategoryType });
+        newCategoryType = '';
+
+        // Refresh the page after adding the category
+        window.location.reload();
     }
 
     async function deleteCategory(categoryId) {
@@ -73,32 +86,141 @@
     function viewLandmarks(categoryId) {
         navigate(`/landmark-category/${categoryId}`);
     }
+
+    // Computed property to get available category types
+    $: availableCategoryTypes = categoryTypes.filter(type => !categories.some(category => category.name === type));
 </script>
+
+<style>
+  main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(-45deg, #4eb99f, #122f41, #ed563b, #f2b035);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+    color: white; /* Ensuring text color is visible on gradient */
+    padding: 20px;
+  }
+
+  .user-info, .edit-form {
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Lighten border for visibility on gradient */
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.5); /* Slight transparency to see the gradient behind */
+    width: 80%; /* Adjust width according to preference */
+  }
+
+  .edit-form input, .edit-form select, .edit-form button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: none;
+  }
+
+  .edit-form button {
+    background-color: #f2b035; /* Button color */
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
+  }
+
+  .edit-form button:hover {
+    background-color: #ed563b; /* Button hover effect */
+  }
+
+  .description {
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.2rem;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .category-list {
+    margin-bottom: 40px; /* Adding some space between the list and form */
+    width: 80%; /* Adjust width according to preference */
+    background-color: rgba(0, 0, 0, 0.5); /* Slight transparency to see the gradient behind */
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Lighten border for visibility on gradient */
+    border-radius: 8px;
+  }
+
+  .category-list li {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .category-list .button {
+    background-color: #f2b035; /* Button color */
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
+    margin-left: 10px;
+  }
+
+  .category-list .button:hover {
+    background-color: #ed563b; /* Button hover effect */
+  }
+
+  .dropdown {
+    margin: 20px 0;
+  }
+
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+</style>
 
 <main class="section">
     <h1 class="title">Category Management</h1>
+    <p class="description">
+        Choose a category to add from the dropdown below. Engage with adding content to enhance your experience and share your adventures with others. Make it awesome!
+    </p>
     {#if loading}
         <p>Loading...</p>
     {:else}
         {#if error}
             <p class="notification is-danger">{error}</p>
         {/if}
-        <ul>
-            {#each categories as category}
-                <li class="mb-2">
-                    <span>{category.name}</span>
-                    <button class="button is-small is-info" on:click={() => viewLandmarks(category.id)}>View Landmarks</button>
-                    <button class="button is-small is-danger ml-2" on:click={() => deleteCategory(category.id)}>Delete</button>
-                </li>
-            {/each}
-        </ul>
-        <div class="field has-addons">
-            <div class="control is-expanded">
-                <input class="input" type="text" bind:value={newCategoryName} placeholder="Add new category" />
+        {#if categories.length > 0}
+            <div class="category-list">
+                <ul>
+                    {#each categories as category}
+                        <li class="mb-2">
+                            <span>{category.name}</span>
+                            <div>
+                                <button class="button is-info" on:click={() => viewLandmarks(category.id)}>View Landmarks</button>
+                                <button class="button is-danger" on:click={() => deleteCategory(category.id)}>Delete</button>
+                            </div>
+                        </li>
+                    {/each}
+                </ul>
             </div>
-            <div class="control">
-                <button class="button is-primary" on:click={addCategory}>Add</button>
-            </div>
+        {/if}
+        <div class="edit-form">
+            <label for="categoryType">Add new category:</label>
+            <select id="categoryType" class="dropdown" bind:value={newCategoryType} required>
+                <option value="" disabled selected>Select a category type</option>
+                {#each availableCategoryTypes as categoryType}
+                    <option value={categoryType}>{categoryType}</option>
+                {/each}
+            </select>
+            <button class="button is-primary" on:click={addCategory}>Add</button>
         </div>
     {/if}
 </main>
+<Footer />

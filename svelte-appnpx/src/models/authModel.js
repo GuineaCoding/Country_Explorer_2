@@ -72,24 +72,25 @@ export const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
-
+   
     // Generate random nonsense words and numbers for first and last name
     const firstName = getRandomElement(nonsenseWords) + getRandomNumber();
     const lastName = getRandomElement(nonsenseWords) + getRandomNumber();
     const userType = 'user';
-
+    await recordLoginEvent(user);
     // Check if the user already has details in the database
     const db = getDatabase();
     const userRef = ref(db, 'users/' + user.uid);
     const snapshot = await get(userRef);
     if (!snapshot.exists()) {
-      // Set initial data if new user
+      
       await set(userRef, {
         firstName: firstName,
         lastName: lastName,
         email: user.email,
         userType: userType
       });
+      
     } else {
       // Update first and last name if not already set
       const userData = snapshot.val();
@@ -124,7 +125,7 @@ async function recordLoginEvent(user) {
   const db = getDatabase();
   const userRef = ref(db, `users/${user.uid}`);
   const analyticsRef = ref(db, `users/${user.uid}/analytics/logins`);
-  const ip = await fetchIpAddress();  // Fetch the user's IP address dynamically
+  const ip = await fetchIpAddress();  
 
   // Increment login count
   const loginCountRef = child(userRef, 'loginCount');
