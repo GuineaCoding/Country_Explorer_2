@@ -12,7 +12,6 @@
     import { navigate } from 'svelte-routing';
     import UserProfile from './views/UserProfile.svelte';
     import PasswordReset from './views/PasswordReset.svelte';
-    
 
     const logoUrl = './logo.svg'; 
 
@@ -33,7 +32,6 @@
         user.set(null);
         navigate('/signin'); 
     }
-    
 </script>
 
 <style>
@@ -103,9 +101,8 @@
     <Route path="/signup" component={Signup} />
     <Route path="/signin" component={SignIn} />
     <Route path="/category" component={Category} />
-    <Route path="/landmark-category/:categoryId" component={LandmarkCategory} />
+    <Route path="/landmark-category/:categoryId/:categoryName" component={LandmarkCategory} />
     <Route path="/landmark/:categoryId/:landmarkId" component={LandmarkDetail} />
     <Route path="/profile" component={UserProfile} onEnter={requireAuth} />
-    <Route path="/password-reset" component={PasswordReset} /> 
+    <Route path="/password-reset" component={PasswordReset} />
 </Router>
-

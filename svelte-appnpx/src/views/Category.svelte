@@ -83,13 +83,14 @@
         categories = categories.filter(category => category.id !== categoryId);
     }
 
-    function viewLandmarks(categoryId) {
-        navigate(`/landmark-category/${categoryId}`);
+    function viewLandmarks(categoryId, categoryName) {
+        navigate(`/landmark-category/${categoryId}/${encodeURIComponent(categoryName)}`);
     }
 
     // Computed property to get available category types
     $: availableCategoryTypes = categoryTypes.filter(type => !categories.some(category => category.name === type));
 </script>
+
 
 <style>
   main {
@@ -203,7 +204,7 @@
                         <li class="mb-2">
                             <span>{category.name}</span>
                             <div>
-                                <button class="button is-info" on:click={() => viewLandmarks(category.id)}>View Landmarks</button>
+                                <button class="button is-info" on:click={() => viewLandmarks(category.id, category.name)}>View Landmarks</button>
                                 <button class="button is-danger" on:click={() => deleteCategory(category.id)}>Delete</button>
                             </div>
                         </li>
