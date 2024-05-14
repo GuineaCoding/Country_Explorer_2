@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { navigate } from 'svelte-routing';
     import { db } from '../services/firebase';
-    import { ref, get, child } from 'firebase/database';
+    import { ref, get } from 'firebase/database';
 
     let users = [];
 
@@ -14,7 +14,6 @@
                 id: key,
                 email: value.email,
                 loginCount: value.loginCount,
-                
                 detailsPage: `/user-details/${key}`
             }));
         }
@@ -26,17 +25,48 @@
 </script>
 
 <style>
+    main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        background: linear-gradient(-45deg, #4eb99f, #122f41, #ed563b, #f2b035);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+        padding: 20px;
+        color: white;
+    }
+
     table {
-        width: 100%;
-        border-collapse: collapse;
+        width: 90%;
+        margin-top: 20px;
+        background-color: rgba(255, 255, 255, 0.1); 
+        border-radius: 8px;
+        overflow: hidden;
     }
     th, td {
-        border: 1px solid #ccc;
-        padding: 8px;
+        padding: 12px;
         text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.25);
     }
     th {
-        background-color: #eee;
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+    tr:last-child td {
+        border-bottom: none;
+    }
+    button {
+        cursor: pointer;
+        background-color: #f2b035; 
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+        margin-top: 5px;
+    }
+    button:hover {
+        background-color: #ed563b;
     }
 </style>
 

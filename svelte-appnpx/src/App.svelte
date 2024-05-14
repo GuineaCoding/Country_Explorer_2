@@ -12,6 +12,7 @@
     import AdminPanel from './views/AdminPanel.svelte';
     import { user } from './stores/authStore';
     import { logoutUser } from './models/authModel.js';
+    import UserDetails from './views/UserDetails.svelte';
     
     const logoUrl = './logo.svg'; 
 
@@ -113,4 +114,5 @@
     <Route path="/profile" component={UserProfile} onEnter={requireAuth} />
     <Route path="/password-reset" component={PasswordReset} />
     <Route path="/admin" component={AdminPanel} onEnter={requireAuth} />
+    <Route path="/user-details/:key" component={UserDetails} />
 </Router>
