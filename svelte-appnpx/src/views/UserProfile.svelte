@@ -28,6 +28,7 @@
       onValue(userRef, (snapshot) => {
         if (snapshot.exists()) {
           userData = snapshot.val();
+          console.log(userData)
           firstName = userData.firstName || '';
           lastName = userData.lastName || '';
         } else {
@@ -114,6 +115,7 @@
   </style>
   
   <main>
+    
     {#if userData}
       <div class="user-info">
         <h1>User Profile</h1>

@@ -43,18 +43,21 @@ export async function getLandmarks(categoryId) {
         const data = snapshot.val();
 
         if (!data) {
+            console.error("No landmarks found for category:", categoryId);
             return [];
         }
 
         return Object.entries(data).map(([key, value]) => ({
             id: key,
+            isPrivate: value.isPrivate || false, // Default to false if isPrivate is not explicitly set
             ...value
         }));
     } catch (e) {
-        console.error("Error fetching landmarks: ", e);
+        console.error("Error fetching landmarks from category:", categoryId, "Error:", e);
         return [];
     }
 }
+
 
 export async function updateLandmark(userId, categoryId, landmarkId, details) {
     console.log("Updating with details:", details);
