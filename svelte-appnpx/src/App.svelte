@@ -14,6 +14,7 @@
     import { logoutUser } from './models/authModel.js';
     import UserDetails from './views/UserDetails.svelte';
     import MapCategory from './views/MapCategory.svelte';
+    import 'leaflet/dist/leaflet.css';
     
     const logoUrl = './logo.svg'; 
 
