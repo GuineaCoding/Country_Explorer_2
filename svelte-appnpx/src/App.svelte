@@ -13,6 +13,7 @@
     import { user } from './stores/authStore';
     import { logoutUser } from './models/authModel.js';
     import UserDetails from './views/UserDetails.svelte';
+    import MapCategory from './views/MapCategory.svelte';
     
     const logoUrl = './logo.svg'; 
 
@@ -115,4 +116,5 @@
     <Route path="/password-reset" component={PasswordReset} />
     <Route path="/admin" component={AdminPanel} onEnter={requireAuth} />
     <Route path="/user-details/:key" component={UserDetails} />
+    <Route path="/map-category" component={MapCategory} />
 </Router>
