@@ -1,5 +1,5 @@
 // Import required Firebase functions
-import { auth } from '../services/firebase.js';
+import { auth, db } from '../services/firebase.js';
 import {
   GoogleAuthProvider,
   signInWithPopup,
@@ -28,7 +28,7 @@ export async function createUser(email, password, firstName, lastName, userType)
       lastName: lastName,
       email: email,
       userType: userType,
-      loginCount: 0 // Initialize login count to 0
+      loginCount: 1 
     });
 
     return user;
@@ -72,40 +72,45 @@ export const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
-   
-    // Generate random nonsense words and numbers for first and last name
-    const firstName = getRandomElement(nonsenseWords) + getRandomNumber();
-    const lastName = getRandomElement(nonsenseWords) + getRandomNumber();
-    const userType = 'user';
-    await recordLoginEvent(user);
-    // Check if the user already has details in the database
-    const db = getDatabase();
-    const userRef = ref(db, 'users/' + user.uid);
+
+    console.log("Google user data:", user); // Log the full user object to inspect what Google provided
+
+    if (!user.email) {
+      console.error("No email available from Google sign-in");
+      throw new Error("Email is required but was not provided by Google sign-in");
+    }
+
+    const firstName = getRandomElement(['Dino', 'Noodle', 'Widget']) + getRandomNumber();
+    const lastName = getRandomElement(['Gizmo', 'Gadget', 'Thing']) + getRandomNumber();
+    const userType = 'user'; // Default user type
+
+    const userRef = ref(getDatabase(), 'users/' + user.uid);
+
     const snapshot = await get(userRef);
     if (!snapshot.exists()) {
-      
       await set(userRef, {
         firstName: firstName,
         lastName: lastName,
         email: user.email,
-        userType: userType
+        userType: userType,
+        loginCount: 0 
       });
-      
     } else {
-      // Update first and last name if not already set
-      const userData = snapshot.val();
       const updates = {};
-      if (!userData.firstName) updates.firstName = firstName;
-      if (!userData.lastName) updates.lastName = lastName;
-      if (!userData.userType) updates.userType = userType;
+      if (!snapshot.val().firstName) updates.firstName = firstName;
+      if (!snapshot.val().lastName) updates.lastName = lastName;
+      if (!snapshot.val().email) updates.email = user.email; 
+      if (!snapshot.val().userType) updates.userType = userType;
 
       if (Object.keys(updates).length > 0) {
         await update(userRef, updates);
       }
     }
 
+    console.log("User data updated or set in Firebase for UID:", user.uid); // Log the successful update
     return user;
   } catch (error) {
+    console.error("Error signing in with Google: ", error);
     throw error;
   }
 };

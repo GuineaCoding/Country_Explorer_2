@@ -20,6 +20,9 @@
     "svelte": "^3.55.0"
   },
   "dependencies": {
+    "chart.js": "^4.4.3",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "date-fns": "^3.6.0",
     "firebase": "^10.11.1",
     "leaflet": "^1.9.4",
     "sirv-cli": "^2.0.0",

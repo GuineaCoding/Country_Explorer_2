@@ -10,35 +10,40 @@
     import UserProfile from './views/UserProfile.svelte';
     import PasswordReset from './views/PasswordReset.svelte';
     import AdminPanel from './views/AdminPanel.svelte';
-    import { user } from './stores/authStore';
-    import { logoutUser } from './models/authModel.js';
     import UserDetails from './views/UserDetails.svelte';
     import MapCategory from './views/MapCategory.svelte';
     import LandmarkOverview from './views/LandmarkOverview.svelte';
-    import 'leaflet/dist/leaflet.css';
-    
-    const logoUrl = './logo.svg'; 
+    import { user } from './stores/authStore';
+    import { logoutUser } from './models/authModel.js';
 
-    // This subscription now holds the complete user object
+    const logoUrl = './logo.svg';
+
     let currentUser;
     user.subscribe(value => {
         currentUser = value;
+        // Redirect from Login/Signup if already logged in
+        if (currentUser && (location.pathname === '/signin' || location.pathname === '/signup')) {
+            navigate('/home');
+        }
     });
 
-    // Protect routes that require admin access
-    function requireAuth() {
-        if (!currentUser || currentUser.userType !== 'admin') {
-            console.log("Access denied. Redirecting to sign-in.");
-            navigate('/signin');
-        } else {
-            console.log("Access granted to admin panel.");
+    function redirectToHomeIfLoggedIn() {
+        if (currentUser) {
+            navigate('/home');
         }
     }
 
-    // Handle logout
-    async function handleLogout(event) {
+    function requireAuth(next) {
+        if (!currentUser) {
+            navigate('/signin');
+        } else {
+            next();
+        }
+    }
+
+    function handleLogout(event) {
         event.preventDefault(); 
-        await logoutUser();
+        logoutUser();
         user.set(null);
         navigate('/signin'); 
     }
@@ -49,17 +54,14 @@
         background-color: #122f41; 
         padding: 1rem;
     }
-
     .navbar-logo {
         height: 50px;
         margin-right: 1rem;
     }
-
     .navbar-menu {
         display: flex;
         align-items: center;
     }
-
     .navbar-link, .logout-link {
         color: white;
         text-decoration: none;
@@ -67,11 +69,9 @@
         border-radius: 4px;
         transition: background-color 0.2s;
     }
-
     .navbar-link:hover, .logout-link:hover {
         background-color: #f2b035;
     }
-
     .navbar-burger {
         background: none;
         border: none;
@@ -109,15 +109,15 @@
 
     <Route path="/" component={Main} />
     <Route path="/home" component={Home} />
-    <Route path="/signup" component={Signup} />
-    <Route path="/signin" component={SignIn} />
-    <Route path="/category" component={Category} />
-    <Route path="/landmark-category/:categoryId/:categoryName" component={LandmarkCategory} />
-    <Route path="/landmark/:categoryId/:landmarkId" component={LandmarkDetail} />
+    <Route path="/signup" component={Signup} onEnter={redirectToHomeIfLoggedIn} />
+    <Route path="/signin" component={SignIn} onEnter={redirectToHomeIfLoggedIn} />
+    <Route path="/category" component={Category} onEnter={requireAuth} />
+    <Route path="/landmark-category/:categoryId/:categoryName" component={LandmarkCategory} onEnter={requireAuth} />
+    <Route path="/landmark/:categoryId/:landmarkId" component={LandmarkDetail} onEnter={requireAuth} />
     <Route path="/profile" component={UserProfile} onEnter={requireAuth} />
-    <Route path="/password-reset" component={PasswordReset} />
+    <Route path="/password-reset" component={PasswordReset} onEnter={requireAuth} />
     <Route path="/admin" component={AdminPanel} onEnter={requireAuth} />
-    <Route path="/user-details/:key" component={UserDetails} />
-    <Route path="/map-category" component={MapCategory} />
-    <Route path="/landmark-overview/:userId/:categoryId/:landmarkId" component={LandmarkOverview} />
+    <Route path="/user-details/:key" component={UserDetails} onEnter={requireAuth} />
+    <Route path="/map-category" component={MapCategory} onEnter={requireAuth} />
+    <Route path="/landmark-overview/:userId/:categoryId/:landmarkId" component={LandmarkOverview} onEnter={requireAuth} />
 </Router>
