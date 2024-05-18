@@ -14,6 +14,7 @@
     import { logoutUser } from './models/authModel.js';
     import UserDetails from './views/UserDetails.svelte';
     import MapCategory from './views/MapCategory.svelte';
+    import LandmarkOverview from './views/LandmarkOverview.svelte';
     import 'leaflet/dist/leaflet.css';
     
     const logoUrl = './logo.svg'; 
@@ -118,4 +119,5 @@
     <Route path="/admin" component={AdminPanel} onEnter={requireAuth} />
     <Route path="/user-details/:key" component={UserDetails} />
     <Route path="/map-category" component={MapCategory} />
+    <Route path="/landmark-overview/:userId/:categoryId/:landmarkId" component={LandmarkOverview} />
 </Router>
