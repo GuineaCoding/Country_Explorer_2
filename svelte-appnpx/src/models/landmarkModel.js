@@ -2,6 +2,7 @@ import { db } from '../services/firebase';
 import { ref, set, push, get, remove, update } from 'firebase/database';
 import { getAuth } from 'firebase/auth';
 
+// Function to add a new landmark
 export async function addLandmark(landmark, categoryId) {
     const auth = getAuth();
     const user = auth.currentUser;
@@ -28,6 +29,7 @@ export async function addLandmark(landmark, categoryId) {
     }
 }
 
+// Function to get landmarks for a category
 export async function getLandmarks(categoryId) {
     const auth = getAuth();
     const user = auth.currentUser;
@@ -58,7 +60,7 @@ export async function getLandmarks(categoryId) {
     }
 }
 
-
+// Function to update a landmark's details
 export async function updateLandmark(userId, categoryId, landmarkId, details) {
     console.log("Updating with details:", details);
     const landmarkRef = ref(db, `users/${userId}/categories/${categoryId}/landmarks/${landmarkId}`);
@@ -72,6 +74,7 @@ export async function updateLandmark(userId, categoryId, landmarkId, details) {
     }
 }
 
+// Function to delete a landmark
 export async function deleteLandmark(userId, categoryId, landmarkId) {
     const auth = getAuth();
     const user = auth.currentUser;
@@ -92,6 +95,7 @@ export async function deleteLandmark(userId, categoryId, landmarkId) {
     }
 }
 
+// Function to fetch a specific landmark
 export async function fetchLandmark(userId, categoryId, landmarkId) {
     const landmarkRef = ref(db, `users/${userId}/categories/${categoryId}/landmarks/${landmarkId}`);
     const snapshot = await get(landmarkRef);

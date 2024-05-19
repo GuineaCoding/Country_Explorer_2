@@ -1,8 +1,13 @@
 <script>
+    // Import resetPassword function from authModel
     import { resetPassword } from '../models/authModel';
+
+    // Import Footer component
     import Footer from './assets/Footer.svelte';
+
     let email = '';
 
+    // Function to handle password reset
     async function handlePasswordReset(event) {
         event.preventDefault();  
         if (email) { 
@@ -17,6 +22,7 @@
         }
     }
 </script>
+
 
 <form on:submit|preventDefault={handlePasswordReset}>
     <input type="email" bind:value={email} placeholder="Enter your email" required>

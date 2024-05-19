@@ -1,17 +1,26 @@
 <script>
+    // Import onMount lifecycle function from svelte
     import { onMount } from "svelte";
+
+    // Import navigate function from svelte-routing
     import { navigate } from "svelte-routing";
+
+    // Import Chart.js library and date-fns adapter
     import Chart from "chart.js/auto";
     import "chartjs-adapter-date-fns";
+
+    // Import firebase database instance and functions
     import { db } from "../services/firebase";
     import { ref, get } from "firebase/database";
 
+    // Import Footer component
     import Footer from "./assets/Footer.svelte";
 
     let users = [];
     let loginTimes = {};
     let deviceCounts = {};
 
+    // Fetch user data and initialize charts on component mount
     onMount(async () => {
         const usersRef = ref(db, "users");
         const snapshot = await get(usersRef);
@@ -45,6 +54,7 @@
         }
     });
 
+    // Function to initialize charts
     function initCharts() {
         const loginTimeCtx = document
             .getElementById("loginTimeChart")
@@ -105,6 +115,7 @@
         });
     }
 
+    // Function to navigate to user details page
     function goToUserPage(page) {
         navigate(page);
     }

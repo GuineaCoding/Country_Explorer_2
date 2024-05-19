@@ -1,17 +1,28 @@
 <script>
+    // Import writable store from svelte
     import { writable } from 'svelte/store';
+
+    // Import onMount lifecycle function from svelte
     import { onMount } from 'svelte';
+
+    // Import firebase database functions
     import { ref, onValue } from 'firebase/database';
+
+    // Import firebase database instance
     import { db } from '../../services/firebase';
+
+    // Import navigate function from svelte-routing
     import { navigate } from 'svelte-routing';
 
     let categories = writable({});
     let activeCategory = writable(null);
 
+    // Function to toggle the active category
     function toggleCategory(categoryName) {
         activeCategory.update(current => current === categoryName ? null : categoryName);
     }
 
+    // Function to handle keydown event for category toggle
     function handleKeydown(event, categoryName) {
         if (event.key === 'Enter' || event.key === ' ') {
             toggleCategory(categoryName);
@@ -19,10 +30,12 @@
         }
     }
 
+    // Function to navigate to landmark details
     function goToLandmarkDetails(userId, categoryId, landmarkId) {
         navigate(`/landmark-overview/${userId}/${categoryId}/${landmarkId}`);
     }
 
+    // Fetch categories and landmarks on component mount
     onMount(() => {
         const catRef = ref(db, 'users');
         onValue(catRef, (snapshot) => {
@@ -48,6 +61,7 @@
         });
     });
 </script>
+
 
 <style>
     .category-list {

@@ -1,14 +1,23 @@
 <script>
+    // Import onMount lifecycle function from svelte
     import { onMount } from 'svelte';
+
+    // Import firebase database functions and instance
     import { ref, get } from 'firebase/database';
     import { db } from '../services/firebase';
+
+    // Import navigate function from svelte-routing
     import { navigate } from 'svelte-routing';
+
+    // Import Footer component
     import Footer from './assets/Footer.svelte';
+
     export let key; 
 
     let user = null;
     let logins = [];
 
+    // Fetch user data and logins on component mount
     onMount(async () => {
         const userRef = ref(db, `users/${key}`);
         const snapshot = await get(userRef);
@@ -27,11 +36,13 @@
         }
     });
 
+    // Function to format date
     function formatDate(dateStr) {
         const date = new Date(dateStr);
         return date.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true });
     }
 
+    // Function to parse browser from user agent string
     function parseBrowser(userAgentString) {
         if (/chrome|chromium|crios/i.test(userAgentString)) {
             return 'Chrome';
@@ -46,10 +57,12 @@
         }
     }
 
+    // Function to navigate back to admin page
     function goBack() {
         navigate('/admin');
     }
 </script>
+
 
 <style>
     main {

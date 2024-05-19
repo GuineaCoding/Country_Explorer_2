@@ -1,6 +1,11 @@
 <script>
+    // Import authentication functions from authModel
     import { loginUser, signInWithGoogle } from '../models/authModel';
+
+    // Import navigate function from svelte-routing
     import { navigate } from 'svelte-routing'; 
+
+    // Import Footer component
     import Footer from './assets/Footer.svelte';
 
     let email = '';
@@ -20,6 +25,7 @@
         return errorMessages[firebaseErrorCode] || 'An unknown error occurred. Please try again.';
     }
 
+    // Function to sign in the user
     async function signIn() {
         try {
             const user = await loginUser(email, password);
@@ -29,10 +35,12 @@
         }
     }
 
+    // Function to navigate to password reset page
     function goToPasswordReset() {
         navigate('/password-reset');  // This route should match the one set up in your main router
     }
 
+    // Function to sign in with Google
     async function signInWithGoogleAction() {
         try {
             const user = await signInWithGoogle();
@@ -42,6 +50,7 @@
         }
     }
 </script>
+
 
 <style>
     @keyframes gradient {

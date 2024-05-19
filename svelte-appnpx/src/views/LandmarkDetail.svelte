@@ -1,12 +1,23 @@
 <script>
+    // Import onMount lifecycle function from svelte
     import { onMount } from 'svelte';
+
+    // Import landmark controller functions
     import { getLandmarkDetails, updateLandmarkDetails } from '../controllers/landmarkController';
+
+    // Import user store from authStore
     import { user } from '../stores/authStore';
+
+    // Import navigate function from svelte-routing
     import { navigate } from 'svelte-routing';
+
+    // Import storage functions from firebase
     import { ref, deleteObject } from 'firebase/storage';
     import { storage } from '../services/firebase';
 
+    // Import Footer component
     import Footer from './assets/Footer.svelte';
+
     export let categoryId;
     export let landmarkId;
 
@@ -24,6 +35,7 @@
 
     $: $user, checkAuthState();
 
+    // Function to check authentication state
     function checkAuthState() {
         if ($user === undefined) {
             loading = true;
@@ -37,6 +49,7 @@
         }
     }
 
+    // Function to initialize landmark details
     async function initializeLandmark() {
         if (categoryId && landmarkId) {
             try {
@@ -57,6 +70,7 @@
         }
     }
 
+    // Function to save landmark details
     async function saveLandmarkDetails() {
         saveError = '';
         loading = true;
@@ -71,6 +85,7 @@
         }
     }
 
+    // Function to delete an image
     async function deleteImage(imageUrl) {
         const imageRef = ref(storage, imageUrl);
         try {

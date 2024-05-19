@@ -1,11 +1,20 @@
 <script>
+    // Import onMount lifecycle function from svelte
     import { onMount } from 'svelte';
+
+    // Import Leaflet library and CSS
     import L from 'leaflet';
     import 'leaflet/dist/leaflet.css';
+
+    // Import firebase database functions and instance
     import { ref, onValue } from 'firebase/database';
     import { db } from '../services/firebase.js'; 
     import { API_KEY } from '../services/firebase.js'; 
+
+    // Import writable store from svelte
     import { writable } from 'svelte/store';
+
+    // Import Footer component
     import Footer from './assets/Footer.svelte';
 
     export let userId;
@@ -18,6 +27,7 @@
     let error = '';
     let mapContainer1, mapContainer2, mapContainer3;
 
+    // Fetch landmark data and initialize maps on component mount
     onMount(() => {
         if (userId && categoryId && landmarkId) {
             const landmarkRef = ref(db, `users/${userId}/categories/${categoryId}/landmarks/${landmarkId}`);
@@ -42,6 +52,7 @@
         }
     });
 
+    // Function to initialize maps
     function initMaps() {
         if (landmarkData.latitude && landmarkData.longitude) {
             const coordinates = [landmarkData.latitude, landmarkData.longitude];
@@ -51,6 +62,7 @@
         }
     }
 
+    // Function to create a map
     function createMap(container, coordinates, tilesURL, attribution) {
         if (container) {
             const map = L.map(container).setView(coordinates, 13);
@@ -59,6 +71,7 @@
         }
     }
 
+    // Function to fetch weather data
     async function fetchWeather(lat, lon) {
         try {
             const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`);
@@ -71,16 +84,20 @@
             error = err.message;
         }
     }
+
     let selectedImage = writable(null);
 
-function openModal(imageUrl) {
-    selectedImage.set(imageUrl);
-}
+    // Function to open image modal
+    function openModal(imageUrl) {
+        selectedImage.set(imageUrl);
+    }
 
-function closeModal() {
-    selectedImage.set(null);
-}
+    // Function to close image modal
+    function closeModal() {
+        selectedImage.set(null);
+    }
 </script>
+
 
 <style>
     .main {

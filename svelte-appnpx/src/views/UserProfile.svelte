@@ -1,62 +1,73 @@
 <script>
-    import { onMount } from 'svelte';
-    import { ref, onValue, update } from 'firebase/database';
-    import { db } from '../services/firebase';
-    import { getAuth, onAuthStateChanged } from 'firebase/auth';
-    import Footer from './assets/Footer.svelte';
+  // Import onMount lifecycle function from svelte
+  import { onMount } from 'svelte';
 
-    let userData = null;
-    let userId = null;
-    let firstName = '';
-    let lastName = '';
+  // Import firebase database functions and instance
+  import { ref, onValue, update } from 'firebase/database';
+  import { db } from '../services/firebase';
 
-    onMount(() => {
-      const auth = getAuth();
-      onAuthStateChanged(auth, user => {
-        if (user) {
-          userId = user.uid;
-          fetchUserData();
-        } else {
-          console.log("No user is signed in.");
-          userData = null;
-        }
-      });
+  // Import authentication functions from firebase
+  import { getAuth, onAuthStateChanged } from 'firebase/auth';
+
+  // Import Footer component
+  import Footer from './assets/Footer.svelte';
+
+  let userData = null;
+  let userId = null;
+  let firstName = '';
+  let lastName = '';
+
+  // Fetch user data on component mount
+  onMount(() => {
+    const auth = getAuth();
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        userId = user.uid;
+        fetchUserData();
+      } else {
+        console.log("No user is signed in.");
+        userData = null;
+      }
     });
+  });
 
-    function fetchUserData() {
-      const userRef = ref(db, 'users/' + userId);
-      onValue(userRef, (snapshot) => {
-        if (snapshot.exists()) {
-          userData = snapshot.val();
-          console.log(userData)
-          firstName = userData.firstName || '';
-          lastName = userData.lastName || '';
-        } else {
-          console.log("No data available for user", userId);
-          userData = null;
-        }
-      }, {
-        onlyOnce: true
-      });
-    }
+  // Function to fetch user data
+  function fetchUserData() {
+    const userRef = ref(db, 'users/' + userId);
+    onValue(userRef, (snapshot) => {
+      if (snapshot.exists()) {
+        userData = snapshot.val();
+        console.log(userData)
+        firstName = userData.firstName || '';
+        lastName = userData.lastName || '';
+      } else {
+        console.log("No data available for user", userId);
+        userData = null;
+      }
+    }, {
+      onlyOnce: true
+    });
+  }
 
-    async function updateUserProfile(event) {
-  event.preventDefault();
-  if (userId) {
-    const updates = {
-      firstName,
-      lastName
-    };
-    try {
-      await update(ref(db, 'users/' + userId), updates);
-      console.log('Profile updated successfully.');
-      fetchUserData(); 
-    } catch (error) {
-      console.error('Error updating profile:', error);
+  // Function to update user profile
+  async function updateUserProfile(event) {
+    event.preventDefault();
+    if (userId) {
+      const updates = {
+        firstName,
+        lastName
+      };
+      try {
+        await update(ref(db, 'users/' + userId), updates);
+        console.log('Profile updated successfully.');
+        fetchUserData(); 
+      } catch (error) {
+        console.error('Error updating profile:', error);
+      }
     }
   }
-}
 </script>
+
 
 <style>
     main {

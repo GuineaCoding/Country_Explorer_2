@@ -1,10 +1,21 @@
 <script>
+    // Import onMount lifecycle function from svelte
     import { onMount } from 'svelte';
+
+    // Import authentication functions from firebase
     import { getAuth, onAuthStateChanged } from 'firebase/auth';
+
+    // Import database functions from firebase
     import { getDatabase, ref, get } from 'firebase/database';
+
+    // Import navigate function from svelte-routing
     import { navigate } from 'svelte-routing';
+
+    // Import Leaflet library and CSS
     import L from 'leaflet';
     import 'leaflet/dist/leaflet.css';
+
+    // Import Footer component
     import Footer from "./assets/Footer.svelte";
 
     let map;
@@ -12,11 +23,11 @@
     let landmarkCount = 0;
     let latestLogin = '';
 
+    // Initialize map and fetch user data on component mount
     onMount(() => {
         const auth = getAuth();
         const db = getDatabase();
 
-    
         onAuthStateChanged(auth, user => {
             if (user) {
                 fetchLandmarks(db, user.uid);
@@ -27,13 +38,13 @@
             }
         });
 
-       
         map = L.map('map').setView([51.505, -0.09], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
     });
 
+    // Function to fetch landmarks from the database
     async function fetchLandmarks(db, userId) {
         const categoriesRef = ref(db, `users/${userId}/categories`);
         const snapshot = await get(categoriesRef);

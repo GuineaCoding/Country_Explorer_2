@@ -1,9 +1,18 @@
 <script>
+    // Import onMount lifecycle function from svelte
     import { onMount } from 'svelte';
+
+    // Import navigate function from svelte-routing
     import { navigate } from 'svelte-routing';
+
+    // Import firebase database instance and functions
     import { db } from '../services/firebase';
     import { ref, set, push, remove, onValue } from 'firebase/database';
+
+    // Import user store from authStore
     import { user } from '../stores/authStore';
+
+    // Import Footer component
     import Footer from './assets/Footer.svelte';
 
     let categories = [];
@@ -24,6 +33,7 @@
 
     $: $user, checkAuthState(); 
 
+    // Function to check authentication state
     function checkAuthState() {
         if ($user === undefined) {
             // Auth state still loading
@@ -37,6 +47,7 @@
         }
     }
 
+    // Function to initialize categories
     function initializeCategories() {
         const categoriesRef = ref(db, `users/${$user.uid}/categories`);
         onValue(categoriesRef, (snapshot) => {
@@ -57,6 +68,7 @@
         });
     }
 
+    // Function to add a new category
     async function addCategory() {
         if (newCategoryType.trim() === '') {
             error = 'Please select a category type.';
@@ -71,10 +83,10 @@
         categories.push({ id: newCategoryRef.key, name: newCategoryType });
         newCategoryType = '';
 
-        
         window.location.reload();
     }
 
+    // Function to delete a category
     async function deleteCategory(categoryId) {
         if (!$user) return;
 
@@ -83,13 +95,15 @@
         categories = categories.filter(category => category.id !== categoryId);
     }
 
+    // Function to view landmarks in a category
     function viewLandmarks(categoryId, categoryName) {
         navigate(`/landmark-category/${categoryId}/${encodeURIComponent(categoryName)}`);
     }
 
-    
+    // Reactive statement to filter available category types
     $: availableCategoryTypes = categoryTypes.filter(type => !categories.some(category => category.name === type));
 </script>
+
 
 
 <style>
