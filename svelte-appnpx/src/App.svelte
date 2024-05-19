@@ -141,6 +141,10 @@
 </Router>
 
 <style>
+    .navbar-end > a {
+        color: white !important;
+    }
+    
     a::after {
         border-color: transparent !important;
     }
