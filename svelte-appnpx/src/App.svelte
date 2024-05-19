@@ -68,12 +68,12 @@
         <div class="navbar-menu">
             <div class="navbar-end">
                 {#if currentUser}
-                    <Link to="/category" class="navbar-link"
+                    <Link to="/category" class="navbar-link has-text-white"
                         >Manage Landmarks</Link
                     >
-                    <Link to="/profile" class="navbar-link">Profile</Link>
+                    <Link to="/profile" class="navbar-link has-text-white">Profile</Link>
                     {#if currentUser.userType === "admin"}
-                        <Link to="/admin" class="navbar-link">Admin Panel</Link>
+                        <Link to="/admin" class="navbar-link has-text-white">Admin Panel</Link>
                     {/if}
                     <a
                         href="javascript:void(0);"
@@ -81,8 +81,8 @@
                         on:click={handleLogout}>Logout</a
                     >
                 {:else}
-                    <Link to="/signup" class="navbar-link">Sign Up</Link>
-                    <Link to="/signin" class="navbar-link">Sign In</Link>
+                    <Link to="/signup" class="navbar-link has-text-white">Sign Up</Link>
+                    <Link to="/signin" class="navbar-link has-text-white">Sign In</Link>
                 {/if}
             </div>
         </div>
@@ -141,17 +141,14 @@
 </Router>
 
 <style>
-    .navbar-end > a {
+
+    .test1 {
         color: white !important;
     }
     
     a::after {
         border-color: transparent !important;
     }
-
-.navbar-link {
-	color: transparent !important;
-}
     .navbar {
         background-color: #122f41;
         padding: 1rem;
