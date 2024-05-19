@@ -6,6 +6,7 @@
     import { ref, deleteObject } from 'firebase/storage';
     import { storage } from '../services/firebase';
 
+    import Footer from './assets/Footer.svelte';
     export let categoryId;
     export let landmarkId;
 
@@ -217,7 +218,7 @@
 </style>
 
 <main>
-    <h1 class="title">Edit Landmark Details</h1>
+    <h1 class="title has-text-white">Edit Landmark Details</h1>
     {#if loading}
         <progress class="progress is-small is-primary" max="100">Loading...</progress>
     {:else if error}
@@ -225,31 +226,31 @@
     {:else}
         <div class="box">
             <div class="field">
-                <label class="label">Name:</label>
+                <label class="label has-text-white">Name:</label>
                 <div class="control">
                     <input class="input" type="text" bind:value={landmark.name}>
                 </div>
             </div>
             <div class="field">
-                <label class="label">Description:</label>
+                <label class="label has-text-white">Description:</label>
                 <div class="control">
                     <textarea class="textarea" bind:value={landmark.description}></textarea>
                 </div>
             </div>
             <div class="field">
-                <label class="label">Latitude:</label>
+                <label class="label has-text-white">Latitude:</label>
                 <div class="control">
                     <input class="input" type="number" step="0.0001" bind:value={landmark.latitude}>
                 </div>
             </div>
             <div class="field">
-                <label class="label">Longitude:</label>
+                <label class="label has-text-white">Longitude:</label>
                 <div class="control">
                     <input class="input" type="number" step="0.0001" bind:value={landmark.longitude}>
                 </div>
             </div>
             <div class="field">
-                <label class="label">Privacy:</label>
+                <label class="label has-text-white">Privacy:</label>
                 <div class="toggle-control">
                     <input id="privacyToggle" type="checkbox" class="toggle" bind:checked={landmark.isPrivate}>
                     <label for="privacyToggle" class="toggle-label"></label>
@@ -258,7 +259,7 @@
             
             {#if Array.isArray(landmark.imageUrls) && landmark.imageUrls.length > 0}
             <div class="field">
-                <label class="label">Images:</label>
+                <label class="label has-text-white">Images:</label>
                 <div class="control images-container">
                     {#each landmark.imageUrls as url (url)}
                         <div class="image-wrapper">
@@ -278,3 +279,4 @@
         </div>
     {/if}
 </main>
+<Footer />

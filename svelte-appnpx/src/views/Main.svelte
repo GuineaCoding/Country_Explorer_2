@@ -108,9 +108,9 @@
 
 <!-- Hero Section -->
 <section class="hero is-medium">
-  <div class="hero-body padding-style"> 
+  <div class="hero-body padding-style">
     <div class="container has-text-centered">
-      <h1 class="title">Discover New Placemarks</h1>
+      <h1 class="title has-text-white">Discover New Placemarks</h1>
       <h2 class="subtitle">Explore, share, and mark your favorite locations.</h2>
       <p class="hero-paragraph">
         Ready to uncover the hidden gems of the world? Our platform empowers you to capture the beauty of the world through your lens.

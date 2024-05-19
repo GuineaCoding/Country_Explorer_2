@@ -187,7 +187,7 @@
 </style>
 
 <main class="section">
-    <h1 class="title">Category Management</h1>
+    <h1 class="title has-text-white">Category Management</h1>
     <p class="description">
         Choose a category to add from the dropdown below. Engage with adding content to enhance your experience and share your adventures with others. Make it awesome!
     </p>

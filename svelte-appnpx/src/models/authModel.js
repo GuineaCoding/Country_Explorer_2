@@ -1,4 +1,3 @@
-// Import required Firebase functions
 import { auth, db } from '../services/firebase.js';
 import {
   GoogleAuthProvider,
@@ -9,7 +8,7 @@ import {
   updateProfile,
   sendPasswordResetEmail
 } from 'firebase/auth';
-import { get, getDatabase, ref, set, push, child, update } from 'firebase/database';
+import { get, ref, set, update, push, getDatabase } from 'firebase/database';
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -30,6 +29,9 @@ export async function createUser(email, password, firstName, lastName, userType)
       userType: userType,
       loginCount: 1 
     });
+
+    // Record the initial login event for new users
+    await recordLoginEvent(user);
 
     return user;
   } catch (error) {
@@ -73,48 +75,36 @@ export const signInWithGoogle = async () => {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
 
-    console.log("Google user data:", user); // Log the full user object to inspect what Google provided
-
     if (!user.email) {
       console.error("No email available from Google sign-in");
       throw new Error("Email is required but was not provided by Google sign-in");
     }
 
-    const firstName = getRandomElement(['Dino', 'Noodle', 'Widget']) + getRandomNumber();
-    const lastName = getRandomElement(['Gizmo', 'Gadget', 'Thing']) + getRandomNumber();
-    const userType = 'user'; // Default user type
-
     const userRef = ref(getDatabase(), 'users/' + user.uid);
-
     const snapshot = await get(userRef);
     if (!snapshot.exists()) {
       await set(userRef, {
-        firstName: firstName,
-        lastName: lastName,
+        firstName: getRandomElement(nonsenseWords) + getRandomNumber(),
+        lastName: getRandomElement(nonsenseWords) + getRandomNumber(),
         email: user.email,
-        userType: userType,
-        loginCount: 0 
+        userType: 'user',
+        loginCount: 1 
       });
     } else {
-      const updates = {};
-      if (!snapshot.val().firstName) updates.firstName = firstName;
-      if (!snapshot.val().lastName) updates.lastName = lastName;
-      if (!snapshot.val().email) updates.email = user.email; 
-      if (!snapshot.val().userType) updates.userType = userType;
-
-      if (Object.keys(updates).length > 0) {
-        await update(userRef, updates);
-      }
+      await update(userRef, {
+        loginCount: (snapshot.val().loginCount || 0) + 1
+      });
     }
 
-    console.log("User data updated or set in Firebase for UID:", user.uid); // Log the successful update
+    // Record each Google login event
+    await recordLoginEvent(user);
+
     return user;
   } catch (error) {
     console.error("Error signing in with Google: ", error);
     throw error;
   }
 };
-
 
 export async function resetPassword(email) {
   try {
@@ -127,13 +117,12 @@ export async function resetPassword(email) {
 }
 
 async function recordLoginEvent(user) {
-  const db = getDatabase();
-  const userRef = ref(db, `users/${user.uid}`);
-  const analyticsRef = ref(db, `users/${user.uid}/analytics/logins`);
+  const userRef = ref(getDatabase(), `users/${user.uid}`);
+  const analyticsRef = ref(getDatabase(), `users/${user.uid}/analytics/logins`);
   const ip = await fetchIpAddress();  
 
   // Increment login count
-  const loginCountRef = child(userRef, 'loginCount');
+  const loginCountRef = ref(db, `users/${user.uid}/loginCount`);
   const snapshot = await get(loginCountRef);
   const currentCount = (snapshot.val() || 0) + 1;
   await update(userRef, { loginCount: currentCount });

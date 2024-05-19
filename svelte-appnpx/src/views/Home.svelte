@@ -1,6 +1,8 @@
 <script>
     import { navigate } from 'svelte-routing'; 
 
+    import Footer from './assets/Footer.svelte';
+    
     function goToLandmarkForm() {
         navigate('/add-landmark');
     }
@@ -14,3 +16,4 @@
     <h2>weqwe</h2>
     <button on:click={goToCategoryLandmark}>Manage Categories</button>
 </main>
+<Footer />
