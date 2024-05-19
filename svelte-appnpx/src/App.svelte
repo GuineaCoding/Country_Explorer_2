@@ -50,12 +50,15 @@
         user.set(null);
         navigate("/signin");
     }
+    
 </script>
 
 <Router>
     <nav class="navbar">
         <div class="navbar-brand">
+            <a href="/home">
             <img src="/logo.svg" alt="Logo" class="navbar-logo" />
+        </a>
             <button class="navbar-burger">
                 <span style="background-color: white;"></span>
                 <span style="background-color: white;"></span>
@@ -138,6 +141,13 @@
 </Router>
 
 <style>
+    a::after {
+        border-color: transparent !important;
+    }
+
+.navbar-link {
+	color: transparent !important;
+}
     .navbar {
         background-color: #122f41;
         padding: 1rem;

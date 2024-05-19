@@ -133,6 +133,7 @@
     .buttonHome:hover {
         background-color: #278a40 !important; 
     }
+
 </style>
 
 <main>
@@ -148,7 +149,7 @@
             <p>{latestLogin}</p>
         </div>
         <div class="column neonBox">
-            <button class="buttonHome" on:click={() => navigate('/explore-landmarks')}>Explore Landmarks</button>
+            <button class="buttonHome" on:click={() => navigate('/map-category')}>Explore Landmarks</button>
         </div>
     </section>
 </main>

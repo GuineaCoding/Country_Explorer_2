@@ -217,4 +217,4 @@ function closeModal() {
     <p>Landmark details could not be loaded. Please check the ID or data source.</p>
 {/if}
 </section>
-<Fotter />
+<Footer />

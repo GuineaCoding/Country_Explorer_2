@@ -14,7 +14,7 @@
 
     function initMap() {
         // Initialize the map
-        map = L.map('map1').setView([51.505, -0.09], 13);
+        map = L.map('map1').setView([0, 0], 3); 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
@@ -55,15 +55,24 @@
         height: 100vh;
     }
 
+    .main {
+        display: flex;
+        height: 100vh;
+        background: linear-gradient(-45deg, #4eb99f, #122f41, #ed563b, #f2b035);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+        max-width: 100% !important;
+    }
+
     .map-container {
         height: 100%;
         width: 80%;
     }
 </style>
 
-<div class="container">
-    <div class="menu category-list"><Sidebar /></div>
+<div class="container main">
+    <div class="menu category-list" style="width: 20%;"><Sidebar /></div>
     
-    <div id="map1" class="map-container"></div>
+    <div id="map1" class="map-container" style="width: 80%;"></div>
 </div>
 <Footer />

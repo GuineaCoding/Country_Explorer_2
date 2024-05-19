@@ -71,7 +71,7 @@
         categories.push({ id: newCategoryRef.key, name: newCategoryType });
         newCategoryType = '';
 
-        // Refresh the page after adding the category
+        
         window.location.reload();
     }
 
@@ -87,7 +87,7 @@
         navigate(`/landmark-category/${categoryId}/${encodeURIComponent(categoryName)}`);
     }
 
-    // Computed property to get available category types
+    
     $: availableCategoryTypes = categoryTypes.filter(type => !categories.some(category => category.name === type));
 </script>
 
@@ -102,17 +102,17 @@
     background: linear-gradient(-45deg, #4eb99f, #122f41, #ed563b, #f2b035);
     background-size: 400% 400%;
     animation: gradient 15s ease infinite;
-    color: white; /* Ensuring text color is visible on gradient */
+    color: white; 
     padding: 20px;
   }
 
   .user-info, .edit-form {
     margin: 20px;
     padding: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.2); /* Lighten border for visibility on gradient */
+    border: 1px solid rgba(255, 255, 255, 0.2); 
     border-radius: 8px;
-    background-color: rgba(0, 0, 0, 0.5); /* Slight transparency to see the gradient behind */
-    width: 80%; /* Adjust width according to preference */
+    background-color: rgba(0, 0, 0, 0.5); 
+    width: 80%; 
   }
 
   .edit-form input, .edit-form select, .edit-form button {
@@ -124,7 +124,7 @@
   }
 
   .edit-form button {
-    background-color: #f2b035; /* Button color */
+    background-color: #f2b035; 
     color: white;
     cursor: pointer;
     font-size: 1rem;
@@ -132,7 +132,7 @@
   }
 
   .edit-form button:hover {
-    background-color: #ed563b; /* Button hover effect */
+    background-color: #ed563b;
   }
 
   .description {
@@ -147,11 +147,11 @@
   }
 
   .category-list {
-    margin-bottom: 40px; /* Adding some space between the list and form */
-    width: 80%; /* Adjust width according to preference */
-    background-color: rgba(0, 0, 0, 0.5); /* Slight transparency to see the gradient behind */
+    margin-bottom: 40px;
+    width: 80%; 
+    background-color: rgba(0, 0, 0, 0.5); 
     padding: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.2); /* Lighten border for visibility on gradient */
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
   }
 
