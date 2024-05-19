@@ -1,10 +1,11 @@
 <script>
     import { resetPassword } from '../models/authModel';
+    import Footer from './assets/Footer.svelte';
     let email = '';
 
     async function handlePasswordReset(event) {
-        event.preventDefault();  // Stop the form from submitting normally
-        if (email) { // Check if email is not empty
+        event.preventDefault();  
+        if (email) { 
             try {
                 const message = await resetPassword(email.trim());
                 console.log(message);
@@ -17,8 +18,8 @@
     }
 </script>
 
-<!-- Form in your Svelte component -->
 <form on:submit|preventDefault={handlePasswordReset}>
     <input type="email" bind:value={email} placeholder="Enter your email" required>
     <button type="submit">Reset Password</button>
 </form>
+<Footer />

@@ -3,7 +3,7 @@
     import { ref, get } from 'firebase/database';
     import { db } from '../services/firebase';
     import { navigate } from 'svelte-routing';
-
+    import Footer from './assets/Footer.svelte';
     export let key; 
 
     let user = null;
@@ -108,3 +108,4 @@
         <p>User data not found.</p>
     {/if}
 </main>
+<Footer />

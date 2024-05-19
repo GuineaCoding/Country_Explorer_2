@@ -31,7 +31,7 @@ export async function addLandmark(landmark, categoryId) {
 export async function getLandmarks(categoryId) {
     const auth = getAuth();
     const user = auth.currentUser;
-
+    console.log(user)
     if (!user) {
         console.error("User is not logged in.");
         return [];

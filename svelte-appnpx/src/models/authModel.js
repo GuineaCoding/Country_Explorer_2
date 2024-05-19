@@ -88,7 +88,7 @@ export const signInWithGoogle = async () => {
         lastName: getRandomElement(nonsenseWords) + getRandomNumber(),
         email: user.email,
         userType: 'user',
-        loginCount: 1 
+        loginCount: 0 
       });
     } else {
       await update(userRef, {

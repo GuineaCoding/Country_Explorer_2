@@ -6,6 +6,7 @@
     import { db } from '../services/firebase.js'; 
     import { API_KEY } from '../services/firebase.js'; 
     import { writable } from 'svelte/store';
+    import Footer from './assets/Footer.svelte';
 
     export let userId;
     export let categoryId;
@@ -216,3 +217,4 @@ function closeModal() {
     <p>Landmark details could not be loaded. Please check the ID or data source.</p>
 {/if}
 </section>
+<Fotter />
